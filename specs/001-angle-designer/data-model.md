@@ -79,6 +79,7 @@ Applied to stored results without re-running the solver (FR-011).
 | `toleranceLbu` | number | Per pin. 0 ≤ value ≤ 1.0 (`SOLVE_TOLERANCE_LBU`); default 0.25 (`DEFAULT_TOLERANCE_LBU`). 0 is allowed |
 | `minConnections` | integer | At least the structural minimum: 2 for a 1D top, 3 for a 2D top (FR-011a) |
 | `minSpacing` | number | Top units (10 LBU), between top points; any top. ≥ 0; default 2; 0 = off |
+| `maxWorstErrorLbu` | number | Hide solutions whose worst kept error is above this; ≥ 0; default 0 (show all) |
 | `maxSpacing` | number | Top units; any top. ≥ 0 and ≥ `minSpacing` when set; default 0 (no limit) |
 
 ## BindingPoint

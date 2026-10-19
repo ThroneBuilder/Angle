@@ -5,7 +5,7 @@ public contract. Changing it in a breaking way needs a new `v` value and a reade
 
 ## Format
 
-`https://angle.thronebuilder.com/?v=1&preset=…&top=…&bottom=…&tol=…&place=…&min=…&smin=…&smax=…&trim=…&a=…`
+`https://angle.thronebuilder.com/?v=1&preset=…&top=…&bottom=…&tol=…&place=…&min=…&smin=…&smax=…&emax=…&trim=…&a=…`
 
 | Key | Value | Example | Default |
 |-----|-------|---------|---------|
@@ -18,6 +18,7 @@ public contract. Changing it in a breaking way needs a new `v` value and a reade
 | `min` | Minimum connections, integer | `4` | structural minimum |
 | `smin` | Minimum spacing between connected top points, top units | `4` | `2` |
 | `smax` | Maximum of the smallest spacing, top units; 0 = no limit | `12` | `0` |
+| `emax` | Maximum worst error, LBU; 0 = all | `0.15` | `0` |
 | `trim` | `1` or `0` | `1` | `0` |
 | `a` | Selected angle, in tenths of a degree | `183` (= 18.3°) | none |
 

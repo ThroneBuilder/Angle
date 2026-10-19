@@ -22,6 +22,7 @@ function preset(id: PresetId, name: string, config: Configuration): Preset {
       minConnections: structuralMinimum(SURFACE_TYPES[config.top.typeId]),
       minSpacing: DEFAULT_MIN_SPACING,
       maxSpacing: 0,
+      maxWorstErrorLbu: 0,
     },
   };
 }

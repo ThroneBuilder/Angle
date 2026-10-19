@@ -118,11 +118,14 @@ export function createControls(container: HTMLElement, events: ControlEvents): C
   const spacingUnit = h('span', {});
   const spacingUnit2 = h('span', {});
   const filterErrors = h('ul', { class: 'errors', role: 'alert' });
+  // The maximum worst error is set from the charts toolbar; carry its current value through.
+  let maxWorstErrorLbu = 0;
   const readFilters = (): FilterSettings => ({
     toleranceLbu: Number(tolerance.value),
     minConnections: Number(minConnections.value),
     minSpacing: Number(minSpacing.value),
     maxSpacing: Number(maxSpacing.value),
+    maxWorstErrorLbu,
   });
   for (const input of [tolerance, minConnections, minSpacing, maxSpacing]) {
     input.addEventListener('input', () => events.filters(readFilters()));
@@ -162,6 +165,7 @@ export function createControls(container: HTMLElement, events: ControlEvents): C
 
   return {
     sync(state, cErrors, fErrors) {
+      maxWorstErrorLbu = state.filters.maxWorstErrorLbu;
       presetSelect.value = state.preset;
       top.sync(state.config.top);
       bottom.sync(state.config.bottom);

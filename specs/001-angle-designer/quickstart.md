@@ -42,11 +42,18 @@ Each checkpoint is done in a real browser (Constitution VI), and its outcome is 
 6. Change the configuration in the middle of a solve. Progress restarts, and no old results
    appear (FR-013).
 
-### US2: Protractor (P2)
+### US2: Protractor and match map (P2)
 
-1. Every listed angle has one mark, and all marks look the same (FR-011b, FR-014).
-2. Click a mark, and the list selects it. Use the keyboard on the list, and the protractor
-   follows (FR-015).
+1. Every listed solution has one protractor dot at its build angle, at the same distance from the
+   center as its height on the match map, in the same color (FR-014a).
+2. Click a mark, and the list and match map select it. Use the keyboard on the list, and the
+   protractor and match map follow (FR-015).
+3. On Technic on wall, the match map shows each solution at its build angle and spacing, colored
+   by worst error. Raise the tolerance, and points are added, mostly at short spacings.
+4. Hover over a match-map point: its build angle, input angles, connections, worst error, spacing,
+   span, dx, and dy are shown. Click it: the list and protractor select the same solution.
+5. Choose "Plot: Connections": both charts change together. Choose "Max worst error ≤ 0.10": points
+   with larger errors leave both charts and the list, and the link gains `emax=0.1` (FR-011f).
 
 ### US3: Surface drawings (P3)
 

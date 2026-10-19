@@ -326,30 +326,67 @@ progress {
   outline-offset: -2px;
 }
 
+.charts {
+  display: grid;
+  grid-template-columns: minmax(200px, 260px) 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+  align-items: start;
+}
+
+.protractor,
 .match-map {
   position: relative;
   background: var(--chart-surface);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 10px 12px;
-  margin-bottom: 12px;
+  min-width: 0;
 }
 
-.match-map:empty {
-  display: none;
-}
-
-.map-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.map-head h3 {
-  margin: 0;
+.protractor h3,
+.match-map h3 {
+  margin: 0 0 4px;
   font-size: 1rem;
+}
+
+.protractor-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.protractor-arc {
+  fill: none;
+  stroke: var(--chart-axis);
+  stroke-width: 1;
+}
+
+.protractor-tick {
+  stroke: var(--chart-axis);
+  stroke-width: 1;
+}
+
+.protractor-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
+@media (max-width: 1000px) {
+  .charts {
+    grid-template-columns: 1fr;
+  }
+
+  .protractor {
+    max-width: 320px;
+  }
+}
+
+.charts-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-bottom: 8px;
 }
 
 .map-measure {
@@ -371,6 +408,7 @@ progress {
 }
 
 .map-grid {
+  fill: none;
   stroke: var(--chart-grid);
   stroke-width: 1;
 }

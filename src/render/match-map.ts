@@ -66,13 +66,48 @@ export function matchMapPoints(
   return { points, yMax, yTicks: ticksFor(yMax) };
 }
 
-export interface MatchMapView {
+export interface ChartView {
   readonly groups: readonly SolutionGroup[] | null;
   readonly selected: AngleTenths | null;
   readonly toleranceLbu: number;
   readonly linear: LinearSteps | null;
   /** Top units for spacing and span, such as holes or studs. */
   readonly unitLabel: string;
+  readonly measure: MapMeasure;
+}
+
+export const MEASURES: readonly [MapMeasure, string][] = [
+  ['spacing', 'Spacing'],
+  ['span', 'Span'],
+  ['connections', 'Connections'],
+];
+
+export function measureLabel(view: ChartView): string {
+  return view.measure === 'connections' ? 'connections' : `${view.measure} (${view.unitLabel})`;
+}
+
+/** Details shown when hovering a solution in either chart. */
+export function tooltipLines(g: SolutionGroup, view: ChartView): string[] {
+  const a = g.best;
+  const lines = [
+    `${formatBuildAngle(g.buildDeg)} build angle`,
+    `Solved at ${g.members.length === 1 ? formatAngle(a.solution.angle) : `${g.members.length} input angles`}`,
+    `${a.kept.length} connections, worst error ${a.shownWorstErrorLbu.toFixed(3)} LBU`,
+  ];
+  if (a.spacingLbu !== null) lines.push(`Spacing ${holes(a.spacingLbu)}, span ${holes(a.spanLbu ?? 0)} ${view.unitLabel}`);
+  if (view.linear) {
+    const span = spanOf(a, view.linear);
+    if (span) lines.push(`dx ${span.dx.toFixed(1)}, dy ${span.dy.toFixed(1)}, length ${span.length.toFixed(3)}`);
+  }
+  return lines;
+}
+
+/** Position a tooltip next to a point given in a chart's viewBox units. */
+export function placeTooltip(tooltip: HTMLElement, host: HTMLElement, viewBoxWidth: number, x: number, y: number): void {
+  const box = host.getBoundingClientRect();
+  const scale = box.width / viewBoxWidth;
+  tooltip.style.left = `${Math.min(box.width - 220, Math.max(0, x * scale + 12))}px`;
+  tooltip.style.top = `${host.offsetTop + y * scale - 8}px`;
 }
 
 const SVG = 'http://www.w3.org/2000/svg';
@@ -87,67 +122,19 @@ const H = 260;
 const M = { left: 40, right: 12, top: 12, bottom: 34 };
 
 export function createMatchMap(container: HTMLElement, onSelect: (angle: AngleTenths) => void) {
-  const measureSelect = h('select', { id: 'map-measure' });
   const subtitle = h('p', { class: 'map-subtitle' });
   const svgHost = h('div', { class: 'map-plot' });
   const tooltip = h('div', { class: 'map-tooltip', role: 'tooltip', hidden: true });
   const legend = h('div', { class: 'map-legend' });
-  container.append(
-    h(
-      'div',
-      { class: 'map-head' },
-      h('h3', {}, 'Match map'),
-      h('div', { class: 'map-measure' }, h('label', { for: 'map-measure' }, 'Plot up'), measureSelect),
-    ),
-    subtitle,
-    svgHost,
-    tooltip,
-    legend,
-  );
+  container.append(h('h3', {}, 'Match map'), subtitle, svgHost, tooltip, legend);
 
-  let measure: MapMeasure = 'spacing';
-  let last: MatchMapView | null = null;
-  measureSelect.addEventListener('change', () => {
-    measure = measureSelect.value as MapMeasure;
-    if (last) render(last);
-  });
-
-  function showTooltip(p: MapPoint, view: MatchMapView, at: { x: number; y: number }) {
-    const g = p.group;
-    const a = g.best;
-    const lines = [
-      `${formatBuildAngle(g.buildDeg)} build angle`,
-      `Solved at ${g.members.length === 1 ? formatAngle(a.solution.angle) : `${g.members.length} input angles`}`,
-      `${a.kept.length} connections, worst error ${a.shownWorstErrorLbu.toFixed(3)} LBU`,
-    ];
-    if (a.spacingLbu !== null) lines.push(`Spacing ${holes(a.spacingLbu)}, span ${holes(a.spanLbu ?? 0)} ${view.unitLabel}`);
-    if (view.linear) {
-      const span = spanOf(a, view.linear);
-      if (span) lines.push(`dx ${span.dx.toFixed(1)}, dy ${span.dy.toFixed(1)}, length ${span.length.toFixed(3)}`);
-    }
-    tooltip.replaceChildren(...lines.map((l) => h('div', {}, l)));
-    tooltip.hidden = false;
-    const box = svgHost.getBoundingClientRect();
-    const scale = box.width / W;
-    const left = Math.min(box.width - 220, Math.max(0, (at.x + M.left) * scale + 12));
-    tooltip.style.left = `${left}px`;
-    tooltip.style.top = `${svgHost.offsetTop + (at.y + M.top) * scale - 8}px`;
-  }
-
-  function render(view: MatchMapView) {
-    last = view;
-    const options: [MapMeasure, string][] = [['spacing', 'Spacing'], ['span', 'Span'], ['connections', 'Connections']];
-    if (!options.some(([m]) => m === measure)) measure = options[0]![0];
-    measureSelect.replaceChildren(...options.map(([m, label]) => h('option', { value: m }, label)));
-    measureSelect.value = measure;
-    measureSelect.disabled = options.length < 2;
-
-    const unit = measure === 'connections' ? 'connections' : `${measure} (${view.unitLabel})`;
+  function render(view: ChartView) {
+    const unit = measureLabel(view);
     subtitle.textContent = `Each dot is a solution: build angle across, ${unit} up. Stronger color = smaller error.`;
 
     const groups = view.groups ?? [];
     const plot = { width: W - M.left - M.right, height: H - M.top - M.bottom };
-    const { points, yMax, yTicks } = matchMapPoints(groups, measure, view.toleranceLbu, plot);
+    const { points, yMax, yTicks } = matchMapPoints(groups, view.measure, view.toleranceLbu, plot);
     const svg = s('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', class: 'map-svg' });
     svg.setAttribute('aria-label', `Match map of ${points.length} solutions by build angle and ${unit}.`);
     const g = s('g', { transform: `translate(${M.left},${M.top})` });
@@ -180,7 +167,11 @@ export function createMatchMap(container: HTMLElement, onSelect: (angle: AngleTe
     // Hit targets larger than the dots, on top.
     for (const p of points) {
       const hit = s('circle', { cx: p.x, cy: p.y, r: 9, class: 'map-hit' });
-      hit.addEventListener('mouseenter', () => showTooltip(p, view, p));
+      hit.addEventListener('mouseenter', () => {
+        tooltip.replaceChildren(...tooltipLines(p.group, view).map((l) => h('div', {}, l)));
+        tooltip.hidden = false;
+        placeTooltip(tooltip, svgHost, W, p.x + M.left, p.y + M.top);
+      });
       hit.addEventListener('mouseleave', () => (tooltip.hidden = true));
       hit.addEventListener('click', () => onSelect(p.group.best.solution.angle));
       marks.append(hit);

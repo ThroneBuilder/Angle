@@ -99,6 +99,8 @@ export interface FilterSettings {
    */
   readonly minSpacing: number;
   readonly maxSpacing: number;
+  /** Hide solutions whose worst error is above this, in LBU; 0 shows all (within tolerance). */
+  readonly maxWorstErrorLbu: number;
 }
 
 /** A surface's binding-point grid, independent of surface type (keeps the solver generic). */

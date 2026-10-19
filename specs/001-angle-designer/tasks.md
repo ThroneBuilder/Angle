@@ -299,19 +299,19 @@ colored by worst error. Both stay in sync with the list.
 
 **Independent Test**: quickstart.md US2 1–2, plus spec US2 acceptance scenarios 4–5.
 
-_Protractor marks (T036–T038) are drawn per solution group (T069), at each group's best angle._
+_Protractor marks (T036–T038) are drawn per solution group (T069), at each group's build angle. Implemented as `src/render/protractor-svg.ts` (`protractorMarks`, `angleAt`, `nearestMark`, `createProtractor`) with `tests/unit/protractor.test.ts`; it sits beside the match map in a `.charts` row, stacked below 1000 px._
 
-- [ ] T036 [P] [US2] Write `tests/unit/protractor.test.ts` for the pure function
+- [X] T036 [P] [US2] Write `tests/unit/protractor.test.ts` for the pure function
   `protractorMarks(angles: AngleTenths[], radius): {k, x1, y1, x2, y2}[]`: one mark for each
   angle; the angle 0° points along +X and 90° along +Y in SVG coordinates (Y flipped); output is
   in angle order.
-- [ ] T037 [US2] Implement `src/render/protractor-svg.ts`: `protractorMarks` plus
+- [X] T037 [US2] Implement `src/render/protractor-svg.ts`: `protractorMarks` plus
   `renderProtractor(container, angles, selected, onSelect)`. The arc has ticks every 10°, and
   every mark is styled the same. The selected mark is outlined, with the same stroke as the others
   (FR-011b). The SVG has `role="img"` and an `aria-label` giving the qualifying count, and is
   `aria-hidden` for selection, because the list is the keyboard path (FR-015). Clicking a mark,
   or the nearest mark within 1°, calls `onSelect`.
-- [ ] T038 [US2] Wire the protractor into `src/main.ts`, so that selecting an angle in the list or
+- [X] T038 [US2] Wire the protractor into `src/main.ts`, so that selecting an angle in the list or
   on the protractor updates both, and the link.
 - [X] T072 [P] [US2] Write `tests/unit/match-map.test.ts` for the pure function
   `matchMapPoints(groups, linear, width, height): { from, best, x, y, color }[]` (FR-014a): one
@@ -328,6 +328,13 @@ _Protractor marks (T036–T038) are drawn per solution group (T069), at each gro
 - [X] T074 [US2] Place the match map beside the protractor in `#results` (stacked below 720 px),
   and wire it into `src/main.ts`, so that selection in the list, protractor, or match map updates all
   three and the link, and filter changes redraw it without re-solving.
+
+- [X] T079 [US2] Protractor as a polar wrap of the match map (FR-014a): `polarPoints` and`n  `nearestPoint` in `src/render/protractor-svg.ts` (dots at build angle, radius = plotted measure,
+  same error colors, hover details, click to select), with `tests/unit/protractor.test.ts`. Shared
+  toolbar in `src/render/charts.ts` chooses the measure for both charts.
+- [X] T080 [US2] Maximum worst error filter (FR-011f): `maxWorstErrorLbu` in `FilterSettings`, applied
+  in `src/solver/filter.ts`, chosen from a toolbar dropdown of error-band edges (`maxErrorChoices`),
+  saved as the `emax` link key, and shown in the settings line. Tests in filter, charts, and url-state.
 
 **Checkpoint**: quickstart.md US2 passes in the browser. US1 still passes.
 

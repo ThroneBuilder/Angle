@@ -8,7 +8,7 @@ import { PRESETS } from './surfaces/presets.ts';
 import { effectiveSteps, SURFACE_TYPES } from './surfaces/surface-types.ts';
 import { structuralMinimum, validateConfiguration, validateFilters } from './surfaces/validate.ts';
 import type { AngleTenths, Configuration, FilterSettings, SolveResult, SurfaceSpec } from './types.ts';
-import { createMatchMap } from './render/match-map.ts';
+import { createCharts } from './render/charts.ts';
 import { createAngleList } from './ui/angle-list.ts';
 import type { LinearSteps } from './ui/span.ts';
 import { createControls } from './ui/controls.ts';
@@ -23,7 +23,11 @@ let groups: SolutionGroup[] | null = null;
 
 const notices = createNotices(document.getElementById('notices')!);
 const client = new SolverClient();
-const matchMap = createMatchMap(document.getElementById('match-map')!, (angle) => select(angle));
+const charts = createCharts(
+  document.getElementById('charts')!,
+  (angle) => select(angle),
+  (maxWorstErrorLbu) => update({ ...state, filters: { ...state.filters, maxWorstErrorLbu } }, false),
+);
 
 const controls = createControls(document.getElementById('controls')!, {
   preset(id) {
@@ -113,6 +117,7 @@ function settingsLine(s: AppLinkState): string {
     `tol ${f.toleranceLbu}`,
     `min ${f.minConnections}`,
     `spacing ${f.minSpacing}–${f.maxSpacing > 0 ? f.maxSpacing : 'any'}`,
+    ...(f.maxWorstErrorLbu > 0 ? [`max error ${f.maxWorstErrorLbu}`] : []),
   ].join(' · ');
 }
 
@@ -175,7 +180,14 @@ function render(): void {
         }
       : null;
   const unitLabel = SURFACE_TYPES[state.config.top.typeId].countX.plural;
-  matchMap.render({ groups, selected: state.angle, toleranceLbu: state.filters.toleranceLbu, linear, unitLabel });
+  charts.render({
+    groups,
+    selected: state.angle,
+    toleranceLbu: state.filters.toleranceLbu,
+    maxWorstErrorLbu: state.filters.maxWorstErrorLbu,
+    linear,
+    unitLabel,
+  });
   list.render({
     settings: settingsLine(state),
     linear,

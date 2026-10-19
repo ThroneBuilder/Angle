@@ -71,5 +71,8 @@ export function validateFilters(f: FilterSettings, top: SurfaceType): string[] {
   } else if (f.maxSpacing > 0 && f.minSpacing > f.maxSpacing) {
     errors.push('Maximum spacing must be at least the minimum spacing.');
   }
+  if (!Number.isFinite(f.maxWorstErrorLbu) || f.maxWorstErrorLbu < 0) {
+    errors.push('Maximum worst error must be 0 (show all) or more.');
+  }
   return errors;
 }

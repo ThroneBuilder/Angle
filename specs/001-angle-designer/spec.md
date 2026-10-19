@@ -58,6 +58,9 @@ CSV downloads."
 - Q: What default minimum spacing, and does spacing apply to area tops? → A: Default 2. For an
   area top, spacing is the minimum distance between any two connected points, so spacing replaces
   the minimum gap for every top. The match map plots spacing by default.
+- Q: How should the protractor show solutions? → A: As a polar wrap of the match map: a dot per
+  solution at its build angle, with the plotted measure (spacing by default) as its radius.
+- Q: Can solutions be filtered by error? → A: Yes, by a maximum worst error dropdown.
 - Q: Can the builder choose the binding-point steps? → A: Yes: width and height step and
   maximum, with choices suited to each surface.
 - Q: How can the builder see why a configuration has many or few solutions? → A: A match map
@@ -302,6 +305,9 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
   smallest spacing (the minimum distance between any two kept points) is at most a maximum
   spacing. Spacing is in the top's units (holes or studs); the minimum defaults to 2, and 0 turns
   either limit off. This replaces the earlier minimum-gap filter.
+- **FR-011f**: The builder MUST be able to set a maximum worst error, chosen from the error-band
+  edges below the tolerance (or All). Solutions whose worst kept error is above it MUST be hidden
+  from the list, the protractor, and the match map alike, and the choice is saved in the link.
 - **FR-011d**: For a linear top, each solution MUST show the vector from the first to the last
   connected hole: dx in studs and dy in bricks for walls (so 0.3 and 0.7 are one and two plates)
   or in studs for plates, the hole span, and the straight-line length in holes.
@@ -317,7 +323,9 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
   protractor, and as points on a match map. A selection in any of them MUST update the others.
 - **FR-014a**: The match map MUST plot every qualifying solution by build angle (0°–90°) against
   spacing by default, with span or connection count as alternatives, and color showing the worst
-  error. Hovering or focusing a point MUST show its angle range, connections, worst error, and,
+  error. The protractor MUST show the same points wrapped onto a 0°–90° quarter circle: build angle
+  around, the same measure as the distance from the center, the same colors. One toolbar chooses
+  the measure for both. Hovering or focusing a point MUST show its angle range, connections, worst error, and,
   for a linear top, dx, dy, and hole span.
 - **FR-015**: Everything the protractor offers MUST also be possible from the list using only a
   keyboard.

@@ -1,5 +1,5 @@
 // Filters applied to stored results, never re-solving (research R5, R15; FR-008, FR-011).
-// Order: tolerance, spacing, then the qualifying rule.
+// Order: tolerance, spacing, then the qualifying rule (including the maximum worst error).
 import type { AngleSolution, Connection, FilterSettings, SolveResult, SolverInput } from '../types.ts';
 import { tierIndexFor } from './constants.ts';
 
@@ -73,10 +73,11 @@ export function applyFilters(solution: AngleSolution, filters: FilterSettings, i
   // A small epsilon keeps a spacing equal to the maximum (√2 studs, for example) inside it.
   const withinMaxSpacing =
     filters.maxSpacing <= 0 || (spacingLbu !== null && spacingLbu <= filters.maxSpacing * 10 + 1e-9);
-  const qualifies =
-    kept.length >= minimum && withinMaxSpacing && (linear || hasNonCollinearTriple(kept));
   let shownWorstErrorLbu = 0;
   for (const c of kept) if (c.errorLbu > shownWorstErrorLbu) shownWorstErrorLbu = c.errorLbu;
+  const withinMaxError = filters.maxWorstErrorLbu <= 0 || shownWorstErrorLbu <= filters.maxWorstErrorLbu + 1e-9;
+  const qualifies =
+    kept.length >= minimum && withinMaxSpacing && withinMaxError && (linear || hasNonCollinearTriple(kept));
   return { solution, kept, qualifies, shownWorstErrorLbu, spacingLbu, spanLbu };
 }
 

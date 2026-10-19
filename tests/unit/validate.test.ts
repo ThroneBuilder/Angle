@@ -59,17 +59,17 @@ describe('validateFilters', () => {
   const plate = SURFACE_TYPES.plate;
 
   it('accepts tolerance from 0 to 1.0', () => {
-    expect(validateFilters({ toleranceLbu: 0, minConnections: 3, minSpacing: 0, maxSpacing: 0 }, plate)).toEqual([]);
-    expect(validateFilters({ toleranceLbu: 1, minConnections: 3, minSpacing: 0, maxSpacing: 0 }, plate)).toEqual([]);
+    expect(validateFilters({ toleranceLbu: 0, minConnections: 3, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0 }, plate)).toEqual([]);
+    expect(validateFilters({ toleranceLbu: 1, minConnections: 3, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0 }, plate)).toEqual([]);
   });
 
   it('rejects tolerance outside 0 to 1.0', () => {
-    expect(validateFilters({ toleranceLbu: -0.1, minConnections: 3, minSpacing: 0, maxSpacing: 0 }, plate)).toHaveLength(1);
-    expect(validateFilters({ toleranceLbu: 1.5, minConnections: 3, minSpacing: 0, maxSpacing: 0 }, plate)).toHaveLength(1);
+    expect(validateFilters({ toleranceLbu: -0.1, minConnections: 3, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0 }, plate)).toHaveLength(1);
+    expect(validateFilters({ toleranceLbu: 1.5, minConnections: 3, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0 }, plate)).toHaveLength(1);
   });
 
   it('rejects a minimum below the structural minimum and a negative spacing', () => {
-    expect(validateFilters({ toleranceLbu: 0.5, minConnections: 2, minSpacing: -1, maxSpacing: 0 }, plate)).toHaveLength(2);
+    expect(validateFilters({ toleranceLbu: 0.5, minConnections: 2, minSpacing: -1, maxSpacing: 0, maxWorstErrorLbu: 0 }, plate)).toHaveLength(2);
   });
 });
 

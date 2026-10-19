@@ -121,7 +121,7 @@ export function readState(search: string): { state: AppLinkState; replaced: stri
   const minimum = structuralMinimum(SURFACE_TYPES[top.typeId]);
   const defaults: FilterSettings =
     preset === 'custom'
-      ? { toleranceLbu: DEFAULT_TOLERANCE_LBU, minConnections: minimum, minSpacing: DEFAULT_MIN_SPACING, maxSpacing: 0 }
+      ? { toleranceLbu: DEFAULT_TOLERANCE_LBU, minConnections: minimum, minSpacing: DEFAULT_MIN_SPACING, maxSpacing: 0, maxWorstErrorLbu: 0 }
       : base.filters;
 
   let toleranceLbu = defaults.toleranceLbu;
@@ -152,6 +152,13 @@ export function readState(search: string): { state: AppLinkState; replaced: stri
     replaced.push('smax');
     maxSpacing = defaults.maxSpacing;
   }
+  let maxWorstErrorLbu = defaults.maxWorstErrorLbu;
+  const emax = q.get('emax');
+  if (emax !== null) {
+    const v = parseNumber(emax);
+    if (v !== null && v >= 0) maxWorstErrorLbu = v;
+    else replaced.push('emax');
+  }
   let trim = false;
   const trimText = q.get('trim');
   if (trimText === '1') trim = true;
@@ -165,12 +172,12 @@ export function readState(search: string): { state: AppLinkState; replaced: stri
   }
 
   return {
-    state: { preset, config, filters: { toleranceLbu, minConnections, minSpacing, maxSpacing }, trim, angle },
+    state: { preset, config, filters: { toleranceLbu, minConnections, minSpacing, maxSpacing, maxWorstErrorLbu }, trim, angle },
     replaced,
   };
 }
 
-/** Keys always in the order v, preset, top, bottom, tol, place, min, smin, smax, trim, a. */
+/** Keys always in the order v, preset, top, bottom, tol, place, min, smin, smax, emax, trim, a. */
 export function writeState(state: AppLinkState): string {
   const parts: [string, string][] = [['v', String(LINK_VERSION)]];
   const named = state.preset !== 'custom' && matchesPreset(state.config, state.preset);
@@ -186,6 +193,7 @@ export function writeState(state: AppLinkState): string {
   parts.push(['min', String(state.filters.minConnections)]);
   parts.push(['smin', num(state.filters.minSpacing)]);
   parts.push(['smax', num(state.filters.maxSpacing)]);
+  parts.push(['emax', num(state.filters.maxWorstErrorLbu)]);
   parts.push(['trim', state.trim ? '1' : '0']);
   if (state.angle !== null) parts.push(['a', String(state.angle)]);
   return '?' + parts.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
