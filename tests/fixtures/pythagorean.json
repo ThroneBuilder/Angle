@@ -1,0 +1,38 @@
+{
+  "_comment": "FROZEN golden fixture from reference/export-fixtures.ps1. Regenerate only on purpose (Constitution VI).",
+  "source": "PythagoreanTriples.ps1",
+  "bottomStepLbu": {
+    "x": 10,
+    "y": 12
+  },
+  "tolerance": 0,
+  "rows": [
+    {
+      "angle": 90.0,
+      "dx": 0,
+      "dy": 5,
+      "liftarm": 6.0,
+      "dxLbu": 0,
+      "dyLbu": 60,
+      "lengthLbu": 60.0
+    },
+    {
+      "angle": 36.9,
+      "dx": 8,
+      "dy": 5,
+      "liftarm": 10.0,
+      "dxLbu": 80,
+      "dyLbu": 60,
+      "lengthLbu": 100.0
+    },
+    {
+      "angle": 67.4,
+      "dx": 5,
+      "dy": 10,
+      "liftarm": 13.0,
+      "dxLbu": 50,
+      "dyLbu": 120,
+      "lengthLbu": 130.0
+    }
+  ]
+}

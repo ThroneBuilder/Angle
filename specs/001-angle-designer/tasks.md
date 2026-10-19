@@ -41,29 +41,29 @@ on its own.
 
 **Purpose**: Create the project and its tooling.
 
-- [ ] T001 Move `FloorAngles.ps1`, `PythagoreanTriples.ps1`, and `DoubleAngles.ps1` from the
+- [X] T001 Move `FloorAngles.ps1`, `PythagoreanTriples.ps1`, and `DoubleAngles.ps1` from the
   repository root into `reference/`, and add `reference/README.md` explaining that they are
   checking references only: never imported, bundled, or deployed.
-- [ ] T002 Create `package.json` (pnpm, `"type": "module"`, `"engines": { "node": ">=24" }`) with
+- [X] T002 Create `package.json` (pnpm, `"type": "module"`, `"engines": { "node": ">=24" }`) with
   scripts `dev` (`vite`), `build` (`tsc --noEmit && vite build`), `preview` (`vite preview`),
   `test` (`vitest run`), `test:watch` (`vitest`), `gen:trig` (`node --experimental-strip-types
   scripts/gen-trig-table.ts`), and `catalog` (`node --experimental-strip-types
   scripts/build-catalog.ts`). Install the dev dependencies `typescript`, `vite`, and `vitest`.
   Add `.node-version` containing `24`.
-- [ ] T003 [P] Create `tsconfig.json` with `strict: true`, `noUncheckedIndexedAccess: true`,
+- [X] T003 [P] Create `tsconfig.json` with `strict: true`, `noUncheckedIndexedAccess: true`,
   `module: "ESNext"`, `moduleResolution: "bundler"`, `target: "ES2022"`,
   `lib: ["ES2022", "DOM", "DOM.Iterable", "WebWorker"]`, `include: ["src", "tests", "scripts"]`.
-- [ ] T004 [P] Create `vite.config.ts` (default single-page config, `worker: { format: 'es' }`) and
+- [X] T004 [P] Create `vite.config.ts` (default single-page config, `worker: { format: 'es' }`) and
   `vitest.config.ts` (`environment: 'node'`, `include: ['tests/**/*.test.ts']`).
-- [ ] T005 [P] Create `index.html` with semantic regions: `<header>`; `<section id="controls">`;
+- [X] T005 [P] Create `index.html` with semantic regions: `<header>`; `<section id="controls">`;
   `<section id="results">` holding `#angle-list` and `#protractor`; `<section id="drawings">`;
   `<section id="view3d">`; `<section id="downloads">`; `<div id="notices" role="status">`. Load
   `src/main.ts`. Create `src/styles.css` with color tokens on `:root`, a dark scheme under
   `prefers-color-scheme`, and a single-column layout below 720 px.
-- [ ] T006 [P] Create `render.yaml` for a Render static site: `buildCommand: pnpm install && pnpm
+- [X] T006 [P] Create `render.yaml` for a Render static site: `buildCommand: pnpm install && pnpm
   build`, `staticPublishPath: dist`, `NODE_VERSION=24`, and the cache headers Faceplate uses
   (`/*` must-revalidate, `/assets/*` immutable for one year).
-- [ ] T007 [P] Create `.gitignore` covering `node_modules/`, `dist/`, `coverage/`, and `.vite/`.
+- [X] T007 [P] Create `.gitignore` covering `node_modules/`, `dist/`, `coverage/`, and `.vite/`.
 
 ---
 
@@ -73,23 +73,23 @@ on its own.
 
 **⚠️ CRITICAL**: No user story work can start until this phase is complete.
 
-- [ ] T008 Create `src/types.ts` with every type from data-model.md: `AngleTenths`,
+- [X] T008 Create `src/types.ts` with every type from data-model.md: `AngleTenths`,
   `SurfaceTypeId`, `SurfaceType`, `SurfaceSpec`, `Configuration`, `FilterSettings`,
   `BindingPoint`, `Placement`, `Connection`, `AngleSolution`, `SolveResult`, `BuildOptions`,
   `Connector`, `PlacedPart`, `Build`, `Catalog`, `PartRef`, `ColorRef`. Every type is plain data
   (no classes, no functions), so it can be passed to and from the worker.
-- [ ] T009 [P] Write `scripts/gen-trig-table.ts`. It generates `src/geometry/trig-table.ts`,
+- [X] T009 [P] Write `scripts/gen-trig-table.ts`. It generates `src/geometry/trig-table.ts`,
   exporting `COS: readonly number[]` and `SIN: readonly number[]` of length 901 (index `k` = `k`
   tenths of a degree), with each value written via `Number.prototype.toString()` (which gives back
   the exact double). Force exact values at `k = 0` (cos 1, sin 0) and `k = 900` (cos 0, sin 1).
   Run it and commit the output.
-- [ ] T010 [P] Write `tests/unit/trig-table.test.ts`: length 901; exact endpoint values;
+- [X] T010 [P] Write `tests/unit/trig-table.test.ts`: length 901; exact endpoint values;
   `|COS[k] − Math.cos(k·π/1800)| < 1e-15` for every k; `COS[k] === SIN[900 − k]` for every k.
-- [ ] T011 [P] Write `tests/unit/units.test.ts`, then `src/geometry/units.ts`, exporting
+- [X] T011 [P] Write `tests/unit/units.test.ts`, then `src/geometry/units.ts`, exporting
   `lbuToLdu(v) = v * 2`, `ldrawY(heightLbu) = -heightLbu * 2`, `tenthsToDegrees(k) = k / 10`,
   and `formatAngle(k)` (`183 → "18.3°"`, `5 → "0.5°"`). Tests cover exact integer results for
   0, 5, 10, 12, 150, and 310 LBU.
-- [ ] T012 [P] Create `src/surfaces/surface-types.ts`, exporting `SURFACE_TYPES: Record<SurfaceTypeId,
+- [X] T012 [P] Create `src/surfaces/surface-types.ts`, exporting `SURFACE_TYPES: Record<SurfaceTypeId,
   SurfaceType>` with exactly these values (spec Surfaces table; research R8 and R9):
   brick `{dimensions 1, stepX 10, maxX 150, view 'top', connectorKind 'stud', edgeOffset 5}`;
   liftarm `{1, stepX 10, maxX 140, 'side', 'hole', 5}`;
@@ -100,20 +100,20 @@ on its own.
   hybridWall `{2, 5, 150, 4, 108, 'side', 'hole', 6}`.
   `receiveStepX`/`receiveStepY` default to `stepX`/`stepY` (research R6, open question). Leave
   `fractionRules`, `baseParts`, and `drawing` as typed empty placeholders, to be filled in US3.
-- [ ] T013 [P] Create `src/surfaces/presets.ts`, exporting `PRESETS` for `brickOnPlate`
+- [X] T013 [P] Create `src/surfaces/presets.ts`, exporting `PRESETS` for `brickOnPlate`
   (brick:150 on plate:150x150), `plateOnPlate` (plate:150x150 on plate:150x150),
   `technicOnWall` (liftarm:140 on technicWall:150x132), and `hybridOnHybrid`
   (hybridWall:150x108 on hybridWall:150x108). All use `placement: 'centered'`, and default
   filters `{ toleranceLbu: 0.5, minConnections: structuralMinimum(top), minGapLbu: 0 }`. Also
   export `SOLVE_TOLERANCE_LBU = 1.0` from `src/solver/constants.ts`.
-- [ ] T014 Write `tests/unit/validate.test.ts`, then `src/surfaces/validate.ts`, exporting
+- [X] T014 Write `tests/unit/validate.test.ts`, then `src/surfaces/validate.ts`, exporting
   `validateConfiguration(c): string[]`, which returns readable errors for: a size that is not a
   positive multiple of its step; a size larger than the type's maximum; a missing `sizeY` on a 2D
   type; a bottom type whose `dimensions` is not 2 (FR-004). Also export
   `validateFilters(f, top): string[]`, which rejects a tolerance outside "0 ≤ value ≤ 1.0" (0 is
   valid) and a negative gap. Also export `structuralMinimum(top) = top.dimensions === 1 ? 2 : 3`
   (FR-011a).
-- [ ] T015 Write `tests/unit/grid.test.ts`, then `src/solver/grid.ts`, exporting
+- [X] T015 Write `tests/unit/grid.test.ts`, then `src/solver/grid.ts`, exporting
   `bindingPoints(spec, role: 'top' | 'bottom'): BindingPoint[]`. The top uses
   `receiveStep*`, and the bottom uses `step*`. Points are ordered by `j`, then `i`, with positions
   from the shared conventions. Tests: plate:150x150 gives 961 points with corners at
@@ -136,7 +136,7 @@ reference scripts. In the browser, run quickstart.md checks US1 1–6 and Link 1
 
 ### Tests for User Story 1 ⚠️ (write first, confirm they fail)
 
-- [ ] T016 [US1] Write `reference/export-fixtures.ps1`, which dot-sources nothing from the
+- [X] T016 [US1] Write `reference/export-fixtures.ps1`, which dot-sources nothing from the
   product. It reuses the reference scripts' formulas and writes JSON into `tests/fixtures/`:
   (a) `double-angles.json`: for DoubleAngles.ps1's grid (X step 5, max 150; Y step 4, max 84;
   centered; tolerance 0.4 LBU), list every 0.1° angle from 0.1 to 89.9 with its matched point
@@ -150,7 +150,7 @@ reference scripts. In the browser, run quickstart.md checks US1 1–6 and Link 1
   `lengthLbu` alongside the original columns. Run it once and commit the three JSON files. Record
   in the file header that the fixtures are frozen and may only be regenerated on purpose
   (Constitution VI).
-- [ ] T017 [P] [US1] Write `tests/fixtures/golden.test.ts`.
+- [X] T017 [P] [US1] Write `tests/fixtures/golden.test.ts`.
   (a) Centered solving of hybridWall:150x84 on hybridWall:150x84, then the tolerance filter at
   0.4, MUST give exactly the connection pairs in `double-angles.json` for every angle. The script uses strict
   `<` on each axis and then `≤` on distance; compare with the solver's `≤` and list any
@@ -159,20 +159,20 @@ reference scripts. In the browser, run quickstart.md checks US1 1–6 and Link 1
   step 10 LBU and length `lengthLbu`, and an ad-hoc 2D bottom with steps 10 × 12 LBU
   (PythagoreanTriples) or 10 × 10 LBU (FloorAngles). Shifted solving, then the tolerance filter
   at 0.5, MUST find at least 2 connections at the row's angle rounded to 0.1°.
-- [ ] T018 [P] [US1] Write `tests/unit/centered.test.ts`: at angle 0 (call
+- [X] T018 [P] [US1] Write `tests/unit/centered.test.ts`: at angle 0 (call
   `solveAngleCentered(config, 0)` directly for the test), a plate on an identical plate matches
   every point with error 0. At 90.0° (k = 900, via the same direct call), a square plate matches
   every point. A liftarm on a plate at 36.9° has connections. All errors are ≤ tolerance, and
   connections are sorted by bottom `(j, i)`.
-- [ ] T019 [P] [US1] Write `tests/unit/circle.test.ts` for the smallest enclosing circle:
+- [X] T019 [P] [US1] Write `tests/unit/circle.test.ts` for the smallest enclosing circle:
   1 point (radius 0), 2 points (diameter), 3 points on a circle, points inside the hull. The
   result is the same whatever order the input arrives in.
-- [ ] T020 [P] [US1] Write `tests/unit/shifted.test.ts`. Build a configuration where the best
+- [X] T020 [P] [US1] Write `tests/unit/shifted.test.ts`. Build a configuration where the best
   placement is an offset of (+2, −1) LBU, and confirm the shifted solve finds it within 0.05 LBU
   with more connections than centered. Shifted never returns fewer connections than centered for
   the same angle. The tie-break order follows research R4 step 4. Every stored error is ≤
   `SOLVE_TOLERANCE_LBU`.
-- [ ] T021 [P] [US1] Write `tests/unit/filter.test.ts`. The tolerance filter runs first and drops
+- [X] T021 [P] [US1] Write `tests/unit/filter.test.ts`. The tolerance filter runs first and drops
   connections with `errorLbu` above the tolerance. At tolerance 0, only connections with error
   exactly 0 remain. At 1.0, nothing is dropped. Changing tolerance never calls the solver (use
   a spy). The gap filter keeps connections in bottom `(j, i)` order, dropping any closer than
@@ -180,26 +180,26 @@ reference scripts. In the browser, run quickstart.md checks US1 1–6 and Link 1
   2D top do not qualify, whatever their number. A 1D top qualifies with 2 connections. A 2D top
   qualifies with 3 non-collinear connections. `minConnections` is raised to the structural
   minimum if set lower.
-- [ ] T022 [P] [US1] Write `tests/contract/solver-determinism.test.ts`. `solveRange(config, 1,
+- [X] T022 [P] [US1] Write `tests/contract/solver-determinism.test.ts`. `solveRange(config, 1,
   899)` on every preset, in both placement modes, run twice, gives deep-equal results. Solutions
   are in angle order with unique angles. No solution has an empty `connections` array. Packing
   then unpacking (`src/solver/packing.ts`) gives back a deep-equal result.
-- [ ] T023 [P] [US1] Write `tests/contract/url-state.test.ts`, covering every row of the "Test
+- [X] T023 [P] [US1] Write `tests/contract/url-state.test.ts`, covering every row of the "Test
   cases" table in `specs/001-angle-designer/contracts/url-state.md`, plus: write then read for each
   preset × placement × an angle gives back the same state, and the key order is stable.
 
 ### Implementation for User Story 1
 
-- [ ] T024 [US1] Implement `src/geometry/circle.ts`: `minEnclosingCircle(points)` using Welzl's
+- [X] T024 [US1] Implement `src/geometry/circle.ts`: `minEnclosingCircle(points)` using Welzl's
   algorithm, iterative. Sort the input by (x, y) before running, so the result never depends on
   input order. Makes T019 pass.
-- [ ] T025 [US1] Implement `src/solver/centered.ts`: `solveAngleCentered(config, k):
+- [X] T025 [US1] Implement `src/solver/centered.ts`: `solveAngleCentered(config, k):
   AngleSolution | null` (research R3). Rotate each top point with `COS[k]`/`SIN[k]`. Find the
   nearest bottom index by `round((X + sizeX/2) / stepX)`, and the same for Y. Skip it if out of
   range, and keep it if `dx² + dy² ≤ SOLVE_TOLERANCE_LBU²`. Store
   `errorLbu = Math.fround(Math.sqrt(dx² + dy²))` (rounded to Float32 so packing is exact). Sort
   connections by bottom `(j, i)`. Return `null` if there are none.
-- [ ] T026 [US1] Implement `src/solver/shifted.ts`: `solveAngleShifted(config, k)`, following
+- [X] T026 [US1] Implement `src/solver/shifted.ts`: `solveAngleShifted(config, k)`, following
   research R4 steps 1–5 exactly. Use grid resolution `h = SOLVE_TOLERANCE_LBU / 5` (0.2 LBU),
   store errors with `Math.fround` as in T025, and scan coverage
   cells in row order from the cell nearest (0, 0). Refine with `minEnclosingCircle`. Try every
@@ -207,17 +207,17 @@ reference scripts. In the browser, run quickstart.md checks US1 1–6 and Link 1
   worst error, then nearest to centered, then smaller |offsetX|, then smaller |offsetY|, then
   positive before negative. Return the centered result unless the shifted one has more
   connections, or the same number with a smaller worst error. Makes T020 pass.
-- [ ] T027 [US1] Implement `src/solver/solve.ts`: synchronous `solveRange(config, fromK, toK):
+- [X] T027 [US1] Implement `src/solver/solve.ts`: synchronous `solveRange(config, fromK, toK):
   AngleSolution[]`, which loops over the range using the placement mode's function, and
   `solveAngle(config, k)` for a single angle. No progress or cancel logic here; the worker
   handles that in chunks (T029). Implement `src/solver/packing.ts` (`pack(result)` and
   `unpack(packed)`, as in the data-model's "Transfer format"). Makes T017, T018, and T022 pass.
-- [ ] T028 [US1] Implement `src/solver/filter.ts`: `applyFilters(solution, filters, top):
+- [X] T028 [US1] Implement `src/solver/filter.ts`: `applyFilters(solution, filters, top):
   { kept: Connection[]; qualifies: boolean; shownWorstErrorLbu: number }` and
   `qualifyingAngles(result, filters)`, as in research R5, in the order tolerance, gap,
   qualify. The collinearity test uses exact integer cross products on bottom `(i, j)`. Makes
   T021 pass.
-- [ ] T029 [US1] Implement `src/solver/worker.ts` and `src/solver/client.ts` according to
+- [X] T029 [US1] Implement `src/solver/worker.ts` and `src/solver/client.ts` according to
   `specs/001-angle-designer/contracts/solver-worker.md`. `solveAll` calls `solveRange` in chunks
   of 10 angles. After each chunk it posts `progress`, then pauses with
   `await new Promise(r => setTimeout(r, 0))`, so a waiting `cancel` is handled before the next
@@ -226,18 +226,18 @@ reference scripts. In the browser, run quickstart.md checks US1 1–6 and Link 1
   the partial result. Results are sent packed, with their buffers in the transfer list. The
   client exposes `start(config)`, `startSingle(config, k)`, and `onUpdate(cb)`, unpacks results,
   and terminates and recreates the worker only if `cancelled` does not arrive within 200 ms.
-- [ ] T030 [US1] Implement `src/state/url-state.ts`: `readState(search): { state; replaced: string[] }`
+- [X] T030 [US1] Implement `src/state/url-state.ts`: `readState(search): { state; replaced: string[] }`
   and `writeState(state): string`, as in `contracts/url-state.md` (keys `v, preset, top, bottom,
   tol, place, min, gap, trim, a`, in that order). Use `replaceState` on changes and `pushState`
   when an angle is selected. Makes T023 pass.
-- [ ] T031 [US1] Implement `src/ui/controls.ts`: a preset selector (4 presets plus Custom); a top
+- [X] T031 [US1] Implement `src/ui/controls.ts`: a preset selector (4 presets plus Custom); a top
   and bottom type picker with size inputs limited to the type's step and maximum (only 2D types in
   the bottom picker); centered/shifted toggle; and, grouped as filters, tolerance (0–1.0, step
   0.05, 0 allowed); minimum connections
   (no lower than `structuralMinimum`); gap (≥ 0). Every control has a `<label>`. Choosing Custom
   copies the current preset's values (FR-003). Show the errors from `validateConfiguration` inline,
   and do not start a solve while there are errors.
-- [ ] T032 [US1] Implement `src/ui/angle-list.ts`: a list of qualifying angles in angle order
+- [X] T032 [US1] Implement `src/ui/angle-list.ts`: a list of qualifying angles in angle order
   (FR-011b), showing angle, connection count after the tolerance and gap filters, worst shown
   error (3 decimals), and the offset when shifted. Selection uses `role="listbox"` with arrow keys,
   Home/End, and Enter (FR-015). Above the list, show a one-line settings summary (FR-023):
@@ -246,10 +246,10 @@ reference scripts. In the browser, run quickstart.md checks US1 1–6 and Link 1
   tol 0.5 · min 2 · gap 0". Also show the qualifying count (research R6), the solve progress, a
   Cancel button, and an empty-state message suggesting looser filters. When the tolerance is 0,
   the message explains that exact matches are rare at 0.1° steps (spec edge case).
-- [ ] T033 [US1] Implement `src/ui/notices.ts` for link replacement notices (FR-025), the
+- [X] T033 [US1] Implement `src/ui/notices.ts` for link replacement notices (FR-025), the
   over-budget offer with a single-angle input (0.1–89.9, 0.1 steps) that calls `startSingle`, and
   "selected angle no longer qualifies".
-- [ ] T034 [US1] Wire it all together in `src/main.ts`: read the link state, then controls; config
+- [X] T034 [US1] Wire it all together in `src/main.ts`: read the link state, then controls; config
   changes start the client; results and filters update the angle list; a selection updates the
   link. Filter changes, including tolerance, re-filter the stored `SolveResult` and redraw the
   list, protractor, and drawings without re-solving (FR-008, FR-011). Only surface and placement
@@ -259,18 +259,47 @@ reference scripts. In the browser, run quickstart.md checks US1 1–6 and Link 1
   that leave real repeating solutions, and the solve time. Ask the owner to (a) approve
   per-preset default `min` values and (b) answer the `receiveStep` question (research R6). Then
   update `src/surfaces/presets.ts` and `surface-types.ts`.
+- [X] T069 [US1] Group qualifying input angles into solutions by build angle (FR-011c):
+  `src/solver/group.ts` (`buildAngle`, `groupSolutions`, `groupOf`) with `tests/unit/group.test.ts`.
+  The list shows one row per solution at its build angle (no range column), and counts report
+  solutions and the input angles they cover. (First version grouped neighbouring angles with
+  identical connections; replaced at the owner's request.)
+- [X] T070 [US1] Show dx, dy, hole span, and length for linear tops (FR-011d) in
+  `src/ui/angle-list.ts`: dy in bricks for walls (side view) and studs for plates.
+- [X] T071 [US1] Defaults from the US1 review: tolerance 0.25 LBU per pin
+  (`DEFAULT_TOLERANCE_LBU` in `src/solver/constants.ts`); shifted placement for the Brick on plate
+  and Technic on wall presets; custom links with no `place` default to shifted for a linear top and
+  centered for an area top (`src/state/url-state.ts`, tests updated).
+- [X] T075 [US1] Width and height step and maximum per surface (FR-005): `stepChoicesX/Y` and
+  `countX/Y` in `src/surfaces/surface-types.ts`; `SurfaceSpec.stepX/stepY`; grid, validation, and
+  link (`@stepXxstepY`) support; select controls in `src/ui/controls.ts`. Tests in grid, validate,
+  and url-state.
+- [X] T076 [US1] Hole-spacing filter for linear tops (FR-011e): `minSpacing`/`maxSpacing` in
+  `FilterSettings`, applied in `src/solver/filter.ts`; Spacing and Span columns in the list;
+  `smin`/`smax` link keys; gap hidden for linear tops. Tests in `tests/unit/filter.test.ts`.
+- [X] T077 [US1] Golden test: the owner's whole-step PythagoreanTriples.ps1 run (23.6, 31.0, 36.9,
+  45.8, 67.4, 79.5, 85.2, 90.0°) is reproduced exactly by build angle, plus the trivial 0° build,
+  in `tests/fixtures/golden.test.ts`.
+- [X] T078 [US1] Spacing for every top, from the owner's review: the minimum spacing walks top
+  points along the liftarm or row by row, and spacing is the smallest distance between any two
+  kept points (FR-011e). It replaces the gap filter (`minGapLbu` and the `gap` link key removed).
+  Default minimum spacing 2 (`DEFAULT_MIN_SPACING`). Spacing and Span columns for every top. The
+  match map offers Spacing (default), Span, and Connections for every top.
 
 **Checkpoint**: US1 is fully usable. `pnpm test` is green, and quickstart.md US1 1–6 and Link 1–2
 pass in a real browser. Stop and review before continuing.
 
 ---
 
-## Phase 4: User Story 2 - Choose an angle on a protractor (Priority: P2)
+## Phase 4: User Story 2 - See and choose solutions on a protractor and match map (Priority: P2)
 
-**Goal**: A 0°–90° protractor with one identical mark for each qualifying angle, kept in sync
-with the list.
+**Goal**: A 0°–90° protractor with one identical mark for each qualifying solution, and a match
+map plotting each solution by angle against hole span (linear tops) or connections (area tops),
+colored by worst error. Both stay in sync with the list.
 
-**Independent Test**: quickstart.md US2 1–2.
+**Independent Test**: quickstart.md US2 1–2, plus spec US2 acceptance scenarios 4–5.
+
+_Protractor marks (T036–T038) are drawn per solution group (T069), at each group's best angle._
 
 - [ ] T036 [P] [US2] Write `tests/unit/protractor.test.ts` for the pure function
   `protractorMarks(angles: AngleTenths[], radius): {k, x1, y1, x2, y2}[]`: one mark for each
@@ -284,6 +313,21 @@ with the list.
   or the nearest mark within 1°, calls `onSelect`.
 - [ ] T038 [US2] Wire the protractor into `src/main.ts`, so that selecting an angle in the list or
   on the protractor updates both, and the link.
+- [X] T072 [P] [US2] Write `tests/unit/match-map.test.ts` for the pure function
+  `matchMapPoints(groups, linear, width, height): { from, best, x, y, color }[]` (FR-014a): one
+  point per solution group; x maps 0°–90° across the plot; y is hole span (0–14) for a linear top
+  or connection count (0 to the largest count) for an area top; color comes from worst error in 5
+  equal bands from 0 to the tolerance. Points are in angle order.
+- [X] T073 [US2] Implement `src/render/match-map-svg.ts`: `matchMapPoints` plus
+  `renderMatchMap(container, view, onSelect)`. Draw an SVG scatter with axes and gridlines (angle
+  every 10°; hole span every 2, or connection count with 5 ticks), a color legend for worst error,
+  and the selected point outlined. Hovering or focusing a point shows a tooltip with angle range,
+  connections, worst error, and for linear tops dx, dy, and holes; clicking selects the group's
+  best angle. Colors come from the CSS tokens in light and dark themes. Points have
+  `role="img"` labels; the list stays the keyboard path (FR-015).
+- [X] T074 [US2] Place the match map beside the protractor in `#results` (stacked below 720 px),
+  and wire it into `src/main.ts`, so that selection in the list, protractor, or match map updates all
+  three and the link, and filter changes redraw it without re-solving.
 
 **Checkpoint**: quickstart.md US2 passes in the browser. US1 still passes.
 
@@ -440,6 +484,60 @@ parts, and connector positions, plus image downloads and the trim option.
 
 _Record measurements, owner decisions, and prototype results here as tasks are completed (T035,
 T040, T051, T061, T064, T066, T068)._
+
+### Implementation notes for US1 (2026-10-19)
+
+- **Shifted placement is optimized per tolerance level (changes research R15).** Solving shifted
+  placement once at 1.0 LBU picked loose clusters (2 connections at ~0.99 LBU) over the real
+  solution (2 at ~0.03 LBU), and the 0.5 filter then dropped everything; the PythagoreanTriples
+  3-4-5 and 12 FloorAngles fixtures failed. The solver now finds the best placement at each of 0.25,
+  0.5, 0.75, and 1.0 LBU (`TIERS_LBU`), still all up front. The filter shows the placement stored
+  for the smallest level at or above the chosen tolerance. Centered placement serves every level.
+  Each `AngleSolution` carries a `tierMask`; identical placements are merged.
+- **Shifted search details (research R4):** coverage grid at tol/6 with exact counts; up to 32
+  top-scoring offsets at least tol/4 apart are refined with the smallest enclosing circle, then
+  grown; whole-step placements are counted with a 2D prefix sum. Offsets snap to a 1e-9 LBU grid
+  so equal placements compare equal. It matches a 0.05 LBU exhaustive search in the unit tests.
+- **Worker budget estimate** uses the second chunk of 10 angles, so start-up time doesn't trigger a
+  false over-budget.
+- **T015:** grids come from `gridFor(spec, role)` + `bindingPoints(grid)`; the solver works on plain
+  `GridSpec`s, so tests can use ad-hoc grids. **T017** uses an ad-hoc grid with the script's steps
+  instead of `hybridWall` (analysis finding M3).
+- **US1 detail panel:** selecting an angle lists its connections (top and bottom column/row, error),
+  so a builder can use US1 before the drawings exist.
+- **Dev dependency added:** `@types/node` (type checking for scripts and tests only).
+
+### Known behavior: borderline cases near the tolerance (owner decision, 2026-10-19)
+
+Errors are measured at the 0.1° input angle, not refit at the exact build angle. A solution whose
+true angle falls between tenths can therefore miss the tolerance by a hair. Example: Technic on
+wall, dx 8.5, dy 7.0, 12 holes, true angle 44.661°. PythagoreanTriples.ps1 keeps it (0.497 LBU
+of length against 0.5); the app's best pin error is 0.2518 LBU at 44.7°, so it appears only at a
+tolerance of 0.26 or more. The owner chose to leave this as is rather than refit errors at the
+build angle.
+
+### T035 measurements (Node 24, all 899 angles; browser times still to be checked)
+
+Qualifying angles at default filters (tolerance 0.5, gap 0), by minimum connections:
+
+| Preset | Placement | Solve time | Default min | min 4 | min 6 | min 8 | min 12 |
+|--------|-----------|-----------:|------------:|------:|------:|------:|-------:|
+| Brick on plate | centered | <0.1 s | 275 (min 2) | 98 | 28 | 16 | 10 |
+| Brick on plate | shifted | 0.8 s | 833 | 176 | 36 | 16 | 10 |
+| Plate on plate | centered | <0.1 s | 899 (min 3) | 899 | 899 | 899 | 869 |
+| Plate on plate | shifted | 5.5 s | 899 | 899 | 899 | 899 | 899 |
+| Technic on wall | centered | <0.1 s | 279 (min 2) | 54 | 12 | 0 | 0 |
+| Technic on wall | shifted | 0.7 s | 884 | 175 | 35 | 8 | 4 |
+| Hybrid on hybrid | centered | <0.1 s | 893 (min 3) | 893 | 892 | 890 | 889 |
+| Hybrid on hybrid | shifted | 4.0 s | 899 | 899 | 899 | 899 | 899 |
+
+Area-on-area presets (centered): median 25–28 connections per angle, 90th percentile ~45. Angles
+within ~1° of 0° or 90° match most points. Qualifying counts at higher minimums: plate on plate
+min 40 → 110, min 60 → 64, min 80 → 42; hybrid on hybrid min 40 → 132, min 60 → 45, min 80 → 24.
+
+**Owner decisions needed (T035):** (a) default minimum connections per preset, for example 4 for
+the linear presets and about 60 for the area presets; (b) whether the top surface receives only
+at whole stud positions (`receiveStep`), which would cut chance matches for plate tops.
 
 ---
 

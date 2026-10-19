@@ -17,7 +17,7 @@ Implements FR-019 to FR-023. Every download is generated from one `Build`
   0 Angle Designer build: Hybrid wall on hybrid wall at 18.3°
   0 Name: angle-hybridOnHybrid-18p3deg.ldr
   0 Author: angle.thronebuilder.com
-  0 // top=hybridWall:150x108 bottom=hybridWall:150x108 tol=0.5 place=c min=3 gap=0 trim=0
+  0 // top=hybridWall:150x108 bottom=hybridWall:150x108 tol=0.5 place=c min=3 smin=2 smax=0 trim=0
   0 // offset=(0.0000,0.0000) LBU connections=6 worstError=0.312 LBU catalog=lego-angle-2026-10-19
   ```
 

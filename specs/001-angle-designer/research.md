@@ -102,7 +102,10 @@ is the case the 10-second budget in R7 protects.
   per angle. Too slow for large surfaces, and the grid-then-refine method finds the same answer in
   practice.
 
-## R5. Qualifying, gap filter, and collinearity
+## R5. Qualifying, spacing filter, and collinearity
+
+_Revised 2026-10-19: the gap filter below was replaced by the spacing filter (spec FR-011e), which
+walks top points in order and measures between top points, in top units._
 
 **Decision**:
 - **Gap filter**: Sort connections by bottom grid index (Y, then X). Keep a connection only if it
@@ -277,10 +280,15 @@ solving (R5). Changing it updates the list, protractor, and drawings without rec
 shown. 1.0 LBU is twice the observed pin tolerance, and it stays below half the smallest step
 (4 LBU / 2), so rounding to the nearest bottom point (R3) still finds the only candidate.
 
-**Trade-off in shifted mode (accepted by the owner)**: The offset is chosen once, at the solve
-tolerance. At a stricter filter tolerance, a slightly different offset might keep more
-connections. The refine step (R4 step 3) already minimizes the worst error, which reduces this.
-The page always shows the stored offset and its errors, so what is shown is accurate.
+**Shifted mode, revised during implementation (2026-10-19)**: Choosing one offset at 1.0 LBU
+turned out to lose real solutions, not just a connection or two. A loose pair near 0.99 LBU tied
+with an exact 3-4-5 pair, won, and was then removed by the 0.5 filter (golden fixtures failed). The
+solver now optimizes shifted placement separately at each tolerance level in
+`TIERS_LBU = [0.25, 0.5, 0.75, 1.0]`, still all up front, and stores each distinct placement with a
+`tierMask`. The filter uses the placement for the smallest level at or above the chosen tolerance.
+Changing the tolerance therefore never re-solves, but crossing a level can show a different stored
+placement. Centered placement serves every level. Cost: about 4–6 s for all angles on area-on-area
+presets in Node.
 
 **Data volume**: At 1.0 LBU, about 12.6% of top points connect at a typical angle (π·1² / 25).
 For a plate on a plate, that is about 120 connections per angle and about 110,000 for all

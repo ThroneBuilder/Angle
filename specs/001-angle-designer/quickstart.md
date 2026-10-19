@@ -36,7 +36,7 @@ Each checkpoint is done in a real browser (Constitution VI), and its outcome is 
 4. Lower the tolerance to 0.2. Angles disappear immediately, with no solve progress shown
    (tolerance is a filter). Set it to 0, and the empty-state message explains exact matches.
    Raise minimum connections to 4. Fewer angles
-   remain. Set a gap of 20. Counts drop (FR-011).
+   remain. Set a minimum spacing of 4. Counts drop (FR-011e).
 5. Switch to shifted placement. The connection count for each angle is the same or higher, and
    each angle shows an offset (FR-007a, FR-007b).
 6. Change the configuration in the middle of a solve. Progress restarts, and no old results

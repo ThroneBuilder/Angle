@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Find the angles at which two LEGO surfaces connect, and download the build." />
+    <title>Angle Designer</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Angle Designer</h1>
+      <p class="tagline">Find the angles at which two LEGO surfaces connect.</p>
+    </header>
+    <main class="layout">
+      <section id="controls" aria-labelledby="controls-heading">
+        <h2 id="controls-heading">Surfaces</h2>
+      </section>
+      <section id="results" aria-labelledby="results-heading">
+        <h2 id="results-heading">Angles</h2>
+        <div id="notices" role="status" aria-live="polite"></div>
+        <div id="match-map" class="match-map"></div>
+        <div id="angle-list"></div>
+        <div id="protractor" hidden></div>
+      </section>
+      <section id="drawings" aria-label="Surface drawings" hidden></section>
+      <section id="view3d" aria-label="3D view" hidden></section>
+      <section id="downloads" aria-label="Downloads" hidden></section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

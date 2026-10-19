@@ -19,7 +19,7 @@ Technical approach:
 - **Determinism** comes from a committed sine/cosine table indexed by tenths of a degree, and
   from comparing squared distances.
 - **Solve once, filter afterwards**: matches are calculated at a fixed 1.0 LBU, and the
-  builder's tolerance (0–1.0), minimum connections, and gap are all filters, so changing them
+  builder's tolerance (0–1.0), minimum connections, and spacing are all filters, so changing them
   never recalculates (research R15).
 - **The solver runs in a Web Worker** in chunks of 10 angles, pausing after each chunk so it can
   be cancelled, with progress and a 10-second budget.
@@ -118,7 +118,7 @@ src/
 │   ├── centered.ts             # R3
 │   ├── shifted.ts              # R4
 │   ├── solve.ts                # solveRange(config, from, to) / solveAngle(config, k)
-│   ├── filter.ts               # Tolerance, gap, collinearity, qualify (R5)
+│   ├── filter.ts               # Tolerance, spacing, collinearity, qualify (R5)
 │   ├── packing.ts              # SolveResult ↔ typed arrays (R15)
 │   ├── worker.ts               # Worker wrapper (contracts/solver-worker.md)
 │   └── client.ts               # Page side of the worker

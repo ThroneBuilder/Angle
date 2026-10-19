@@ -1,0 +1,254 @@
+{
+  "_comment": "FROZEN golden fixture from reference/export-fixtures.ps1. Regenerate only on purpose (Constitution VI).",
+  "source": "FloorAngles.ps1",
+  "bottomStepLbu": {
+    "x": 10,
+    "y": 10
+  },
+  "tolerance": 0.07,
+  "rows": [
+    {
+      "angle": 90.0,
+      "dx": 0,
+      "dy": 1,
+      "liftarm": 1.0,
+      "dxLbu": 0,
+      "dyLbu": 10,
+      "lengthLbu": 10.0
+    },
+    {
+      "angle": 7.1,
+      "dx": 8,
+      "dy": 1,
+      "liftarm": 8.062,
+      "dxLbu": 80,
+      "dyLbu": 10,
+      "lengthLbu": 80.0
+    },
+    {
+      "angle": 6.3,
+      "dx": 9,
+      "dy": 1,
+      "liftarm": 9.055,
+      "dxLbu": 90,
+      "dyLbu": 10,
+      "lengthLbu": 90.0
+    },
+    {
+      "angle": 5.7,
+      "dx": 10,
+      "dy": 1,
+      "liftarm": 10.05,
+      "dxLbu": 100,
+      "dyLbu": 10,
+      "lengthLbu": 100.0
+    },
+    {
+      "angle": 5.2,
+      "dx": 11,
+      "dy": 1,
+      "liftarm": 11.045,
+      "dxLbu": 110,
+      "dyLbu": 10,
+      "lengthLbu": 110.0
+    },
+    {
+      "angle": 4.8,
+      "dx": 12,
+      "dy": 1,
+      "liftarm": 12.042,
+      "dxLbu": 120,
+      "dyLbu": 10,
+      "lengthLbu": 120.0
+    },
+    {
+      "angle": 4.4,
+      "dx": 13,
+      "dy": 1,
+      "liftarm": 13.038,
+      "dxLbu": 130,
+      "dyLbu": 10,
+      "lengthLbu": 130.0
+    },
+    {
+      "angle": 4.1,
+      "dx": 14,
+      "dy": 1,
+      "liftarm": 14.036,
+      "dxLbu": 140,
+      "dyLbu": 10,
+      "lengthLbu": 140.0
+    },
+    {
+      "angle": 36.9,
+      "dx": 4,
+      "dy": 3,
+      "liftarm": 5.0,
+      "dxLbu": 40,
+      "dyLbu": 30,
+      "lengthLbu": 50.0
+    },
+    {
+      "angle": 53.1,
+      "dx": 3,
+      "dy": 4,
+      "liftarm": 5.0,
+      "dxLbu": 30,
+      "dyLbu": 40,
+      "lengthLbu": 50.0
+    },
+    {
+      "angle": 29.7,
+      "dx": 7,
+      "dy": 4,
+      "liftarm": 8.062,
+      "dxLbu": 70,
+      "dyLbu": 40,
+      "lengthLbu": 80.0
+    },
+    {
+      "angle": 26.6,
+      "dx": 8,
+      "dy": 4,
+      "liftarm": 8.944,
+      "dxLbu": 80,
+      "dyLbu": 40,
+      "lengthLbu": 90.0
+    },
+    {
+      "angle": 22.6,
+      "dx": 12,
+      "dy": 5,
+      "liftarm": 13.0,
+      "dxLbu": 120,
+      "dyLbu": 50,
+      "lengthLbu": 130.0
+    },
+    {
+      "angle": 60.3,
+      "dx": 4,
+      "dy": 7,
+      "liftarm": 8.062,
+      "dxLbu": 40,
+      "dyLbu": 70,
+      "lengthLbu": 80.0
+    },
+    {
+      "angle": 32.5,
+      "dx": 11,
+      "dy": 7,
+      "liftarm": 13.038,
+      "dxLbu": 110,
+      "dyLbu": 70,
+      "lengthLbu": 130.0
+    },
+    {
+      "angle": 82.9,
+      "dx": 1,
+      "dy": 8,
+      "liftarm": 8.062,
+      "dxLbu": 10,
+      "dyLbu": 80,
+      "lengthLbu": 80.0
+    },
+    {
+      "angle": 63.4,
+      "dx": 4,
+      "dy": 8,
+      "liftarm": 8.944,
+      "dxLbu": 40,
+      "dyLbu": 80,
+      "lengthLbu": 90.0
+    },
+    {
+      "angle": 41.6,
+      "dx": 9,
+      "dy": 8,
+      "liftarm": 12.042,
+      "dxLbu": 90,
+      "dyLbu": 80,
+      "lengthLbu": 120.0
+    },
+    {
+      "angle": 83.7,
+      "dx": 1,
+      "dy": 9,
+      "liftarm": 9.055,
+      "dxLbu": 10,
+      "dyLbu": 90,
+      "lengthLbu": 90.0
+    },
+    {
+      "angle": 48.4,
+      "dx": 8,
+      "dy": 9,
+      "liftarm": 12.042,
+      "dxLbu": 80,
+      "dyLbu": 90,
+      "lengthLbu": 120.0
+    },
+    {
+      "angle": 84.3,
+      "dx": 1,
+      "dy": 10,
+      "liftarm": 10.05,
+      "dxLbu": 10,
+      "dyLbu": 100,
+      "lengthLbu": 100.0
+    },
+    {
+      "angle": 84.8,
+      "dx": 1,
+      "dy": 11,
+      "liftarm": 11.045,
+      "dxLbu": 10,
+      "dyLbu": 110,
+      "lengthLbu": 110.0
+    },
+    {
+      "angle": 57.5,
+      "dx": 7,
+      "dy": 11,
+      "liftarm": 13.038,
+      "dxLbu": 70,
+      "dyLbu": 110,
+      "lengthLbu": 130.0
+    },
+    {
+      "angle": 85.2,
+      "dx": 1,
+      "dy": 12,
+      "liftarm": 12.042,
+      "dxLbu": 10,
+      "dyLbu": 120,
+      "lengthLbu": 120.0
+    },
+    {
+      "angle": 67.4,
+      "dx": 5,
+      "dy": 12,
+      "liftarm": 13.0,
+      "dxLbu": 50,
+      "dyLbu": 120,
+      "lengthLbu": 130.0
+    },
+    {
+      "angle": 85.6,
+      "dx": 1,
+      "dy": 13,
+      "liftarm": 13.038,
+      "dxLbu": 10,
+      "dyLbu": 130,
+      "lengthLbu": 130.0
+    },
+    {
+      "angle": 85.9,
+      "dx": 1,
+      "dy": 14,
+      "liftarm": 14.036,
+      "dxLbu": 10,
+      "dyLbu": 140,
+      "lengthLbu": 140.0
+    }
+  ]
+}

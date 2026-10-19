@@ -32,14 +32,14 @@ Static data. One record per row of the spec's Surfaces table, defined in `src/su
 |-------|------|-------|
 | `id` | `'brickOnPlate' \| 'plateOnPlate' \| 'technicOnWall' \| 'hybridOnHybrid'` | |
 | `config` | `Configuration` | A preset is just a named configuration (FR-003) |
-| `filters` | `FilterSettings` | The preset's default filters (tolerance 0.5, structural minimum, gap 0) |
+| `filters` | `FilterSettings` | The preset's default filters (tolerance 0.25, structural minimum, spacing 2 to no limit) |
 
-| Preset | Top | Bottom |
-|--------|-----|--------|
-| Brick on plate | brick | plate |
-| Plate on plate | plate | plate |
-| Technic on wall | liftarm | technicWall |
-| Hybrid wall on hybrid wall | hybridWall | hybridWall |
+| Preset | Top | Bottom | Placement |
+|--------|-----|--------|-----------|
+| Brick on plate | brick | plate | shifted |
+| Plate on plate | plate | plate | centered |
+| Technic on wall | liftarm | technicWall | shifted |
+| Hybrid wall on hybrid wall | hybridWall | hybridWall | centered |
 
 ## Configuration
 
@@ -54,8 +54,21 @@ What the solver needs. Changing any of these re-runs the solver.
 The solver always matches at the fixed `SOLVE_TOLERANCE_LBU = 1.0` (research R15). Tolerance is
 not part of the Configuration.
 
-**SurfaceSpec**: `{ typeId, sizeX, sizeY? }`. Each size is a positive multiple of the type's step
-and no larger than the type's maximum. `sizeY` is required only for 2D types.
+**SurfaceSpec**: `{ typeId, sizeX, sizeY?, stepX?, stepY? }`. A step, when present, is one of the
+type's `stepChoicesX`/`stepChoicesY`; absent means the type's default (steps equal to the default
+are dropped, so equal designs compare and link equally). Each size is a positive multiple of its
+step and no larger than the type's maximum; the UI offers sizes as whole-unit counts from
+`countX`/`countY` (n units span `n × unitLbu − insetLbu`). `sizeY` is required only for 2D types.
+
+| Type | Width steps | Width count | Height steps | Height count |
+|------|-------------|-------------|--------------|--------------|
+| brick | stud 10 | 2–16 studs | | |
+| liftarm | hole 10 | 2–15 holes | | |
+| technic | hole 10, half hole 5 | 2–16 studs | | |
+| plate | stud 10, half stud 5 | 2–16 studs | stud 10, half stud 5 | 2–16 studs |
+| baseplate | stud 10, half stud 5 | 2–32 studs | stud 10, half stud 5 | 2–32 studs |
+| technicWall | stud 10, half stud 5 | 2–16 studs | brick 12, plate 4 | 2–12 bricks ((n − 1) × 12) |
+| hybridWall | stud 10, half stud 5 | 2–16 studs | plate 4 | 1–6 layers (n × 20 − 12) |
 
 ## FilterSettings
 
@@ -63,9 +76,10 @@ Applied to stored results without re-running the solver (FR-011).
 
 | Field | Type | Validation |
 |-------|------|------------|
-| `toleranceLbu` | number | 0 ≤ value ≤ 1.0 (`SOLVE_TOLERANCE_LBU`); default 0.5. 0 is allowed |
+| `toleranceLbu` | number | Per pin. 0 ≤ value ≤ 1.0 (`SOLVE_TOLERANCE_LBU`); default 0.25 (`DEFAULT_TOLERANCE_LBU`). 0 is allowed |
 | `minConnections` | integer | At least the structural minimum: 2 for a 1D top, 3 for a 2D top (FR-011a) |
-| `minGapLbu` | number | ≥ 0; default 0 (off) |
+| `minSpacing` | number | Top units (10 LBU), between top points; any top. ≥ 0; default 2; 0 = off |
+| `maxSpacing` | number | Top units; any top. ≥ 0 and ≥ `minSpacing` when set; default 0 (no limit) |
 
 ## BindingPoint
 
@@ -94,14 +108,32 @@ One per angle that has at least one connection. Produced by the solver.
 
 | Field | Type | Notes |
 |-------|------|-------|
-| `angle` | `AngleTenths` | Unique within a result set |
+| `angle` | `AngleTenths` | At most one solution per angle and tolerance level |
+| `tierMask` | number | Bit t set: shown when the tolerance falls in level t of `TIERS_LBU = [0.25, 0.5, 0.75, 1.0]` (research R15). Centered solutions set every bit |
 | `placement` | `Placement` | |
 | `connections` | `Connection[]` | Sorted by bottom `(j, i)`; this order is part of the contract |
 | `worstErrorLbu` | number | Largest `errorLbu` |
 
 **Derived (computed by the filter, never stored)**: `kept` (connections left after the tolerance
-filter and then the gap filter), `qualifies` (FR-011a), `connectionCount = kept.length`, and
+filter and then the spacing filter), `qualifies` (FR-011a), `connectionCount = kept.length`, and
 `shownWorstErrorLbu` (largest error among `kept`).
+
+## SolutionGroup
+
+Derived on the page after filtering (FR-011c); never stored or sent between threads.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `buildDeg` | number | The angle the build makes: best-fit rotation of the kept connections. Members agree to 0.01° |
+| `from`, `to` | `AngleTenths` | Smallest and largest member input angles (members need not be neighbours) |
+| `best` | filtered angle | Most connections, then smallest shown worst error, then input angle nearest `buildDeg` |
+| `members` | filtered angles | Every input angle that builds this angle, in order |
+
+A filtered angle also carries `spacingLbu` and `spanLbu`: the smallest and largest distance between any
+two kept top points (on a liftarm, the closest neighbouring holes and first to last hole).
+
+The list, protractor, and match map show one entry per group. A linked angle may be any member;
+it selects its group.
 
 ## SolveResult
 
@@ -144,7 +176,7 @@ The single model behind the drawings, the 3D view, LDraw, and the CSV (FR-021, C
 | `config`, `filters`, `options` | | Copied in, so the build states its settings (FR-023) |
 | `angle` | `AngleTenths` | |
 | `placement` | `Placement` | |
-| `connections` | `Connection[]` | The kept connections only (after the tolerance and gap filters) |
+| `connections` | `Connection[]` | The kept connections only (after the tolerance and spacing filters) |
 | `bottomParts`, `topParts` | `PlacedPart[]` | Surface plus offset parts, in that surface's own coordinates |
 | `connectors` | `Connector[]` | |
 | `catalogVersion` | string | |
