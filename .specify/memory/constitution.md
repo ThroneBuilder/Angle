@@ -1,24 +1,33 @@
 <!--
 Sync Impact Report
-- Version change: (unversioned template) → 1.0.0
-- Modified principles: N/A (initial constitution; all principles are new)
-  - I.   Geometric Truth in LBU
-  - II.  One Solver, Surfaces by Configuration
-  - III. Browser-Only & Deterministic
-  - IV.  Physically Buildable Results
-  - V.   One Solution Model, Many Views
-  - VI.  Incremental, Test-Gated Delivery
-- Added sections:
-  - Core Principles (I–VI)
-  - Technology, Hosting & Constraints
-  - Development Workflow & Quality Gates
-  - Governance
+- Version change: 1.1.0 → 1.2.0 (MINOR: workflow rule changed; no principle affected)
+- Modified sections:
+  - Development Workflow & Quality Gates: removed the requirement that every feature be built on
+    a dedicated feature branch. Branches are optional, and work may be committed directly to
+    `master` if each commit passes the merge gates. Rated MINOR rather than MAJOR because the
+    versioning policy reserves MAJOR for principle changes, and this is a workflow rule. Approved
+    by the project owner on 2026-10-19 (from /speckit-analyze finding C1).
+- Dependent artifacts: specs/001-angle-designer (no branch task needed; plan header already notes
+  work is on `master`).
+
+Previous amendment, same day:
+- Version change: 1.0.0 → 1.1.0 (MINOR: materially expanded guidance in Principle I)
+- Modified principles:
+  - I. Geometric Truth in LBU: "centered origin for rotating and matching" split into
+    (a) rotation always about the shared centered origin, (b) centered placement as the default,
+    and (c) an optional, reported offset of the rotated top surface. The offset never forces a
+    connection to zero error, and errors are measured after the shift.
+- Added sections: none
 - Removed sections: none
+- Rationale: spec 001-angle-designer clarification (FR-007, option C). Anchoring one point at
+  zero error, as the reference scripts do, can miss solutions. Rated MINOR rather than MAJOR:
+  the centered default and the top-left-for-rendering-only rule are unchanged, and the new
+  option adds requirements (reported offset, errors measured after the shift) instead of
+  loosening any. Approved by the project owner on 2026-10-19.
+- Dependent artifacts: specs/001-angle-designer/spec.md already conforms (FR-007, FR-007a–c);
+  no plan exists yet.
 - Templates: not modified (dependent templates read this file at runtime)
 - Deferred TODOs: none
-- Notes: Conventions aligned with sibling LEGO projects Faceplate (browser-only, deterministic,
-  TypeScript strict) and Mountain (LDraw primary export, currently produced parts only,
-  Windows 11 Smart App Control), and hosted under the ThroneBuilder domain.
 -->
 
 # Angle Constitution
@@ -33,8 +42,13 @@ answer it gives MUST be geometrically exact and explainable.
 - All internal geometry MUST be expressed in LEGO Base Units (LBU): a brick is 10 LBU wide and
   12 LBU high. Conversions to other units (pixels, LDraw LDU, studs) MUST happen only at the
   output boundary, through a single, tested conversion module.
-- The solver MUST use a centered origin for both surfaces when rotating and matching points.
-  Conversion to a top-left origin is a rendering concern only and MUST NOT affect matching.
+- The solver MUST rotate the top surface about a centered origin shared by both surfaces. By
+  default the surfaces are matched in that centered placement.
+- The solver MAY also shift the rotated top surface by an offset if it finds more connections or
+  smaller errors. The offset MUST be reported with each result. It MUST NOT force any connection
+  to zero error, and every connection's error MUST be measured after the shift. Centered
+  placement is the case where the offset is zero.
+- Conversion to a top-left origin is a rendering concern only and MUST NOT affect matching.
 - Match tolerance MUST be an explicit, user-visible parameter. The default is 0.5 LBU (observed
   pin tolerance), and the user MUST be able to change it.
 - Every reported connection MUST carry its measured positional error in LBU. A solution MUST NOT
@@ -151,8 +165,9 @@ are the fastest way to catch them.
 
 ## Development Workflow & Quality Gates
 
-- Every feature follows the Spec Kit lifecycle: specify → clarify → plan → tasks → implement,
-  on a dedicated feature branch.
+- Every feature follows the Spec Kit lifecycle: specify → clarify → plan → tasks → implement.
+  Feature branches are optional. Work MAY be committed directly to `master`, provided each
+  commit passes the merge gates below.
 - Every `/speckit-plan` MUST include a Constitution Check against Principles I–VI. Any deviation
   MUST be justified in the plan's Complexity Tracking table.
 - **Merge gates:** solver golden-fixture tests pass; unit conversion tests pass; exported LDraw
@@ -177,4 +192,4 @@ tasks MUST be checked against it.
 - **Runtime guidance:** `initial-spec.md` is the detailed product reference. Where it conflicts
   with this constitution, this constitution governs until either document is amended.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-19 | **Last Amended**: 2026-10-19
+**Version**: 1.2.0 | **Ratified**: 2026-10-19 | **Last Amended**: 2026-10-19

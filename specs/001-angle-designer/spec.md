@@ -13,6 +13,30 @@ wall-on-wall (`DoubleAngles.ps1`) calculations. It covers presets, surface defin
 solutions with filters, a protractor view, 2D and 3D solution rendering, and image, LDraw, and
 CSV downloads."
 
+## Clarifications
+
+### Session 2026-10-19
+
+- Q: Should the downloaded build and parts list include the parts that make each connection
+  between the two surfaces? → A: Yes. Connecting parts are chosen automatically from the two
+  surface types (Technic pin for hole to hole; direct stud or jumper plate for studs).
+- Q: Should the build use the full surface sizes or be trimmed to the area around the
+  connections? → A: Full sizes by default, with an option to trim each surface to the smallest
+  standard part size that still covers every connection.
+- Q: Should a design's settings be saved in the page link so it can be bookmarked or shared?
+  → A: Yes. The link holds the configuration, filters, and selected angle, and opening it
+  restores the exact design.
+- Q: How should the page rank which angle solutions are best? → A: It doesn't rank them. An
+  angle either qualifies or it doesn't, and the builder narrows the results with filters
+  (tolerance, minimum connections, minimum gap). Connections usually repeat in a regular
+  pattern, so the count mostly reflects surface size and spacing, which the filters already
+  control. To qualify, a linear (1D) top needs at least 2 connections, and an area (2D) top needs
+  at least 3 connections that are not all on one line.
+- Q: Is tolerance a filter, or a calculation setting? → A: A filter. Matches are calculated once,
+  at the largest tolerance the page allows, and the chosen tolerance only hides connections with
+  larger errors. Changing it updates the list and drawings without recalculating.
+- Q: Is a tolerance of zero allowed? → A: Yes, to show how rarely exact matches happen.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Find the angles two surfaces can make (Priority: P1)
@@ -43,10 +67,12 @@ connection positions against the reference scripts' output for the same configur
    the list.
 4. **Given** found angles are listed, **When** the builder sets a minimum of 4 connections,
    **Then** only angles with at least 4 connections remain.
-5. **Given** found angles are listed, **When** the builder sets a minimum connection gap,
+5. **Given** an area (2D) top surface, **When** an angle has 3 or more connections that all lie
+   on one line, **Then** that angle is not listed.
+6. **Given** found angles are listed, **When** the builder sets a minimum connection gap,
    **Then** connections closer than that gap to another kept connection are dropped from each
    angle's count, and the minimum-connections filter applies to the reduced count.
-6. **Given** a configuration from one of the reference scripts, **When** its angle is selected,
+7. **Given** a configuration from one of the reference scripts, **When** its angle is selected,
    **Then** the matched connections are the same as the script's matches. Any difference is
    listed as a known, justified correction.
 
@@ -54,8 +80,9 @@ connection positions against the reference scripts' output for the same configur
 
 ### User Story 2 - Choose an angle on a protractor (Priority: P2)
 
-The builder sees the found angles as marks on a protractor graphic from 0° to 90°, highlighted
-by quality (for example, connection count). They can select an angle either from the protractor
+The builder sees every qualifying angle as a mark on a protractor graphic from 0° to 90°. All
+marks look the same: an angle either qualifies under the current filters or it doesn't. They
+can select an angle either from the protractor
 or from the list. Both stay in sync.
 
 **Why this priority**: The protractor shows at a glance where solutions cluster and where the
@@ -147,9 +174,11 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
 
 - No angle in 0.1°–89.9° has any connection that passes the current filters: the page says so
   and suggests loosening the tolerance, minimum connections, or gap.
-- Exactly one connection at an angle: a single pin is a pivot, not a fixed angle. Such angles are
-  hidden by the default minimum of 2 connections, and are shown as pivot-only if the builder
-  lowers it to 1.
+- Too few connections to fix the angle (a single pin is a pivot): the angle does not qualify. The
+  builder cannot set the minimum below the structural minimum (2 for a linear top, 3 for an area
+  top).
+- An area top whose connections all lie on one line, whatever their number: the top could swing
+  about that line, so the angle does not qualify.
 - Custom sizes that are not a multiple of the step, are zero, or are larger than the surface's
   maximum: the builder is told what is wrong, and the calculation does not run until it is fixed.
 - A 1D surface chosen as the bottom surface: not allowed. Only 2D surfaces can be chosen as the
@@ -160,11 +189,16 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
 - The builder changes a setting while a calculation is running: the old calculation stops and a
   new one starts from the new settings.
 - Two angles that round to the same 0.1° label: each 0.1° step is shown once.
-- Tolerance set to 0: only exact matches are found, as in `PythagoreanTriples.ps1`.
+- Tolerance set to 0: allowed, to show how rare exact matches are. Only connections with zero
+  error remain, and because angles are tested in 0.1° steps, usually no angle qualifies. The
+  empty-state message explains this.
 - Shifted placement finds more connections than centered placement at the same angle: the page
   shows the shifted result and its offset, and the builder can switch back to centered to compare.
 - An offset moves top binding points off the edge of the bottom surface: those points do not
   count as connections.
+- Trim to connections when no standard part size covers the connections exactly: the next
+  larger standard size is used. For walls built from several parts, trimming shortens the
+  layers and removes whole layers that hold no connections.
 
 ## Requirements *(mandatory)*
 
@@ -201,14 +235,21 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
 - **FR-007c**: When several offsets give the same number of connections at one angle, the page
   MUST prefer the one with the smallest worst error, then the one closest to centered.
 - **FR-008**: A pair of points MUST count as a connection only if the distance between them is
-  within the tolerance. The default tolerance is 0.5 LBU, and the builder can change it.
+  within the tolerance. The default tolerance is 0.5 LBU, and the builder can set it anywhere
+  from 0 to 1.0 LBU. Tolerance is a filter (FR-011): changing it MUST NOT recalculate matches.
 - **FR-009**: Every connection MUST show its error (distance in LBU).
 - **FR-010**: The page MUST test every angle from 0.1° to 89.9° in 0.1° steps for the current
   configuration, and list each angle that has connections, with its connection count and worst
   error.
 - **FR-011**: The builder MUST be able to filter found angles by tolerance, minimum number of
-  connections (default 2), and minimum gap between connections. Filters MUST only change which
+  connections, and minimum gap between connections. The minimum number of connections defaults
+  to, and cannot go below, the structural minimum in FR-011a. Filters MUST only change which
   results are shown. They MUST NOT change how points are calculated.
+- **FR-011a**: An angle MUST qualify only if, after the gap filter, it has at least 2 connections
+  for a linear (1D) top, or at least 3 connections that are not all on one line for an area (2D)
+  top.
+- **FR-011b**: The page MUST NOT rank or score qualifying angles. Every qualifying angle MUST be
+  shown the same way, and the list MUST be in angle order.
 - **FR-012**: Results MUST be the same every time for the same settings, in every supported
   browser.
 - **FR-013**: The calculation MUST show progress, MUST be cancellable, and MUST NOT freeze the
@@ -217,8 +258,8 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
 
 **Choosing an angle**
 
-- **FR-014**: Found angles MUST be shown both as a list and as marks on a 0°–90° protractor. A
-  selection in either MUST update the other.
+- **FR-014**: Qualifying angles MUST be shown both as a list and as identical marks on a 0°–90°
+  protractor. A selection in either MUST update the other.
 - **FR-015**: Everything the protractor offers MUST also be possible from the list using only a
   keyboard.
 
@@ -234,12 +275,30 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
   image.
 - **FR-020**: The builder MUST be able to download the selected solution as an LDraw build file,
   and as a CSV parts list whose part and color counts match the LDraw file exactly.
+- **FR-020a**: The build file and parts list MUST include a connecting part at every connection,
+  chosen automatically from the two surface types: a Technic pin where a hole meets a hole, and
+  no extra part (direct stud) or a jumper plate where a stud is used. The 3D view MUST show the
+  same connecting parts.
+- **FR-020b**: By default, the build MUST use the full surface sizes from the configuration. The
+  builder MUST be able to turn on "trim to connections", which shrinks each surface to the
+  smallest standard part size that still covers every connection. Trimming MUST NOT change the
+  angle, placement, or connections. The drawings, 3D view, and both downloads MUST all reflect
+  whether trimming is on.
 - **FR-021**: The 2D drawings, 3D view, LDraw file, and parts list MUST all describe the same
   solution: the same parts, positions, and connections.
 - **FR-022**: Builds and parts lists MUST use only LEGO parts and colors that are currently
   produced.
 - **FR-023**: Every result MUST state its settings: surfaces, sizes, tolerance, filters, and
   the version of the parts catalog used.
+
+**Sharing**
+
+- **FR-024**: The page link MUST always reflect the current configuration (surfaces, sizes,
+  placement mode), filters (tolerance, minimum connections, gap), trim setting, and selected
+  angle. Opening that link MUST
+  restore the same design and the same results.
+- **FR-025**: A link with missing, unknown, or out-of-range values MUST still open. Invalid values
+  fall back to the preset defaults, and the page says which values were replaced.
 
 ### Key Entities
 
@@ -248,8 +307,8 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
   used to create fractional offsets.
 - **Surface**: A surface type at a chosen size, used as the top or bottom of a design.
 - **Binding point**: A position on a surface where a stud, hole, or pin can connect, in LBU.
-- **Configuration**: A top surface, a bottom surface, a tolerance, and a placement mode (centered
-  or shifted). A preset is a named configuration.
+- **Configuration**: A top surface, a bottom surface, and a placement mode (centered or shifted).
+  A preset is a named configuration, together with its default filter settings.
 - **Placement**: The offset of the rotated top surface from the centered position, in LBU. It is
   zero in centered mode.
 - **Connection**: A top binding point and a bottom binding point that line up within tolerance at
@@ -257,8 +316,11 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
 - **Angle solution**: An angle (in 0.1° steps), its placement, and its connections, with
   connection count and worst error.
 - **Filter settings**: Tolerance, minimum connections, and minimum connection gap.
-- **Build**: The parts, colors, and positions that make up a chosen solution, used by the
-  drawings, the 3D view, and both downloads.
+- **Connector**: The part that joins a top binding point to a bottom binding point at a
+  connection (for example, a Technic pin). It is chosen from the pair of surface types.
+- **Build**: The parts, colors, and positions that make up a chosen solution, including the
+  surfaces, offset parts, and connectors. The drawings, the 3D view, and both downloads all use
+  it.
 - **Parts catalog**: The versioned list of currently produced LEGO parts and colors that builds
   may use, with its source and date.
 
@@ -280,11 +342,14 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
   results every time.
 - **SC-007**: The project owner can physically assemble at least one solution from each preset
   using only the downloaded files, and every connection fits without forcing.
+- **SC-008**: Opening a shared design link in a fresh browser shows the same selected angle,
+  connections, and downloads as the browser it was shared from, 100% of the time.
 
 ## Assumptions
 
 - **Audience**: LEGO builders who are comfortable with stud, hole, and LBU measurements. The
-  first user is the project owner. No accounts, and nothing is saved between visits.
+  first user is the project owner. There are no accounts and no server-side storage. A design is
+  kept only in its page link.
 - **Preset mapping**: Brick on plate = Brick on Plate. Plate on plate = Plate on Plate. Technic
   on wall = Liftarm on Technic Wall. Hybrid wall on hybrid wall = Hybrid Wall on Hybrid Wall.
   Baseplate and Technic brick are available only in Custom.
