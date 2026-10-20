@@ -425,20 +425,20 @@ parts, and connector positions, plus image downloads and the trim option.
 
 **Independent Test**: quickstart.md US4 1–2.
 
-- [ ] T052 [US4] Add `three` as a dependency and `@types/three` as a dev dependency (the plan's
+- [X] T052 [US4] Add `three` as a dependency and `@types/three` as a dev dependency (the plan's
   only runtime dependency besides the build).
-- [ ] T053 [US4] Implement `src/render/view3d.ts`: `createView3d(container)` returns
+- [X] T053 [US4] Implement `src/render/view3d.ts`: `createView3d(container)` returns
   `{ show(build), savePng(name), dispose() }`. Draw stand-in geometry in LBU (research R10):
   boxes for bricks and plates, cylinders for studs, holes, pins, and risers. Place the bottom
   surface at the origin. The top surface is rotated by the angle and moved by the placement
   offset, raised to rest on the connectors. Use `OrbitControls` and
   `WebGLRenderer({ preserveDrawingBuffer: true })`, and redraw only when needed. Load the module
   lazily with dynamic `import()` the first time an angle is selected, so US1 loads quickly.
-- [ ] T054 [US4] Add `tests/unit/view3d-placement.test.ts` for the pure function that
+- [X] T054 [US4] Add `tests/unit/view3d-placement.test.ts` for the pure function that
   `view3d.ts` uses (export it as `worldTransform(build, which)`). It checks that the world
   position of every connector on the top surface is within the connection's `errorLbu` of the
   matching bottom point (FR-018, FR-021).
-- [ ] T055 [US4] Wire the 3D view and its "Save view" button into `src/main.ts`.
+- [X] T055 [US4] Wire the 3D view and its "Save view" button into `src/main.ts`.
 
 **Checkpoint**: quickstart.md US4 passes. Earlier stories still pass.
 
@@ -551,6 +551,19 @@ build angle.
   placement control is a single "Allow all imperfect" checkbox (checked = shifted).
 - **Drawings** have no automated DOM test (no browser test runner, research R14); they are checked
   by hand in quickstart US3.
+
+### US4 implementation notes (2026-10-20)
+
+- `src/render/world.ts` (pure): `planeFrame`/`toPlane` place each surface in the shared rotation
+  plane (origin at the original bottom's center; top rotated by the solved input angle and moved
+  by the placement offset), and `stackFor` stacks them along the normal: flat (plates, bricks) with
+  one-plate risers between, or upright (walls, liftarms) face to face with pins through.
+  `tests/unit/world.test.ts` checks every connection lands within 1e-4 LBU of its stated error, for
+  every preset, trimmed and untrimmed (T054; the task named the function `worldTransform`).
+- `src/render/view3d.ts` builds the scene from the Build (boxes, instanced studs, pins, red
+  connection markers; the top surface slightly transparent). `src/ui/view3d-section.ts` loads it
+  with `import()` on first selection and rebuilds only when the build changes. three.js 0.186 is a
+  separate 559 kB chunk (139 kB gzipped). No automated rendering test (research R14).
 
 ### T035 measurements (Node 24, all 899 angles; browser times still to be checked)
 

@@ -1,7 +1,7 @@
 // Image downloads (T049; FR-019). Images are for viewing only, so they are not covered by the
 // determinism requirement.
 
-function save(blob: Blob, name: string): void {
+export function save(blob: Blob, name: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

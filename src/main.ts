@@ -14,6 +14,7 @@ import { CATALOG } from './catalog/catalog.ts';
 import { groupOf } from './solver/group.ts';
 import { createAngleList } from './ui/angle-list.ts';
 import { createDrawings } from './ui/drawings.ts';
+import { createView3dSection } from './ui/view3d-section.ts';
 import type { LinearSteps } from './ui/span.ts';
 import { createControls } from './ui/controls.ts';
 import { createNotices } from './ui/notices.ts';
@@ -70,6 +71,7 @@ const controls = createControls(document.getElementById('controls')!, {
 });
 
 const drawings = createDrawings(document.getElementById('drawings')!);
+const view3d = createView3dSection(document.getElementById('view3d')!);
 
 const list = createAngleList(
   document.getElementById('angle-list')!,
@@ -205,7 +207,7 @@ function render(): void {
   });
   const group = groupOf(groups ?? [], state.angle);
   const chosen = group?.members.find((m) => m.solution.angle === state.angle) ?? group?.best;
-  drawings.render(
+  const build =
     group && chosen
       ? makeBuild({
           solution: chosen,
@@ -215,9 +217,13 @@ function render(): void {
           options: { trimToConnections: state.trim },
           catalog: CATALOG,
         })
-      : null,
-    state.preset,
-  );
+      : null;
+  drawings.render(build, state.preset);
+  // Rebuild the 3D scene only when what is built changes, not on every progress tick.
+  const buildKey = build
+    ? JSON.stringify([state.config, state.trim, chosen?.solution.angle, chosen?.kept.map((k) => [k.top, k.bottom])])
+    : '';
+  view3d.render(build, state.preset, buildKey);
   list.render({
     settings: settingsLine(state),
     linear,
