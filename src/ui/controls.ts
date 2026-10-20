@@ -5,6 +5,7 @@ import { effectiveSteps, normalizeSpec, sizeChoices, SURFACE_TYPES, SURFACE_TYPE
 import { structuralMinimum } from '../surfaces/validate.ts';
 import type { AppLinkState } from '../state/url-state.ts';
 import type { FilterSettings, PlacementMode, StepChoice, SurfaceSpec, SurfaceTypeId, UnitCount } from '../types.ts';
+import { collapsible } from './collapsible.ts';
 import { h } from './dom.ts';
 
 export interface ControlEvents {
@@ -69,18 +70,20 @@ function surfaceFieldset(which: 'top' | 'bottom', events: ControlEvents) {
     select.addEventListener('change', () => events.surface(which, read()));
   }
 
-  const fieldset = h(
-    'fieldset',
-    {},
-    h('legend', {}, label),
+  // Foldable, remembered per browser; the heading summarizes the surface when folded.
+  const panel = collapsible(`surface-def-${which}`, label, 'surface-def');
+  panel.body.append(
     field(id('type'), 'Type', typeSelect),
     h('div', { class: 'field-row' }, field(id('x'), 'Width max', sizeX), field(id('step-x'), 'Width step', stepX)),
     heightRow,
   );
+  const fieldset = panel.element;
 
   const sync = (spec: SurfaceSpec) => {
     const type = SURFACE_TYPES[spec.typeId];
     const steps = effectiveSteps(spec);
+    const size = spec.sizeY === undefined ? `${spec.sizeX}` : `${spec.sizeX}×${spec.sizeY}`;
+    panel.summary.textContent = `${label}: ${type.name}, ${size} LBU`;
     typeSelect.value = spec.typeId;
     fillSizes(sizeX, type.countX, spec.sizeX);
     fillSteps(stepX, type.stepChoicesX, steps.stepX);
@@ -142,46 +145,30 @@ export function createControls(container: HTMLElement, events: ControlEvents): C
     h('div', { class: 'field' }, h('label', { for: 'smax', title: '0 = no limit' }, 'Max. spacing (', spacingUnit2, ')'), maxSpacing),
   );
 
+  // Filters, placement, and trimming together; foldable, with a one-line summary when folded.
+  const filtersPanel = collapsible('filters', 'Filters', 'surface-def');
+  const check = (input: HTMLInputElement, id: string, text: string, title: string) =>
+    h('label', { for: id, title, class: 'check' }, input, text);
+  filtersPanel.body.append(
+    h('div', { class: 'field' }, h('label', { for: 'tol' }, `Tolerance per pin (LBU, 0–${SOLVE_TOLERANCE_LBU})`), tolerance),
+    h('div', { class: 'field' }, h('label', { for: 'min' }, 'Min. connections'), minConnections),
+    spacingRow,
+    h(
+      'div',
+      { class: 'check-list' },
+      check(imperfect, 'allow-imperfect', 'Allow all imperfect', 'Shift the top surface off center to find more solutions (slower)'),
+      check(tessellated, 'tess', 'Trim tessellated connections', 'Keep only connections in the repeating pattern; drop one-off connections'),
+      check(trim, 'trim', 'Trim to connections', 'Shrink each built surface to whole units around its connections'),
+    ),
+    filterErrors,
+  );
+
   container.append(
     h('div', { class: 'field' }, h('label', { for: 'preset' }, 'Preset'), presetSelect),
     top.fieldset,
     bottom.fieldset,
     configErrors,
-    h(
-      'fieldset',
-      {},
-      h('legend', {}, 'Placement'),
-      h(
-        'div',
-        { class: 'radio-row' },
-        h('label', { for: 'allow-imperfect', title: 'Shift the top surface off center to find more solutions (slower)' }, imperfect, 'Allow all imperfect'),
-      ),
-    ),
-    h(
-      'fieldset',
-      {},
-      h('legend', {}, 'Filters'),
-      h('div', { class: 'field' }, h('label', { for: 'tol' }, `Tolerance per pin (LBU, 0–${SOLVE_TOLERANCE_LBU})`), tolerance),
-      h('div', { class: 'field' }, h('label', { for: 'min' }, 'Min. connections'), minConnections),
-      spacingRow,
-      h(
-        'div',
-        { class: 'radio-row' },
-        h(
-          'label',
-          { for: 'tess', title: 'Keep only connections in the repeating pattern; drop one-off connections' },
-          tessellated,
-          'Trim tessellated connections',
-        ),
-      ),
-      filterErrors,
-    ),
-    h(
-      'fieldset',
-      {},
-      h('legend', {}, 'Build'),
-      h('div', { class: 'radio-row' }, h('label', { for: 'trim' }, trim, 'Trim to connections')),
-    ),
+    filtersPanel.element,
   );
 
   const setErrors = (list: HTMLUListElement, errors: string[]) => {
@@ -215,6 +202,16 @@ export function createControls(container: HTMLElement, events: ControlEvents): C
       minConnections.min = String(structuralMinimum(topType));
       setErrors(configErrors, cErrors);
       setErrors(filterErrors, fErrors);
+      const f = state.filters;
+      filtersPanel.summary.textContent = [
+        'Filters',
+        `tol ${f.toleranceLbu}`,
+        `min ${f.minConnections}`,
+        `spacing ${f.minSpacing}–${f.maxSpacing > 0 ? f.maxSpacing : 'any'}`,
+        ...(state.config.placement === 'shifted' ? ['imperfect'] : []),
+        ...(f.tessellatedOnly ? ['tessellated'] : []),
+        ...(state.trim ? ['trimmed'] : []),
+      ].join(' · ');
     },
   };
 }

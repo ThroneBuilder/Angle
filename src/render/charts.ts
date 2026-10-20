@@ -32,7 +32,7 @@ export function createCharts(
     'div',
     { class: 'charts-toolbar' },
     h('div', { class: 'map-measure' }, h('label', { for: 'chart-measure' }, 'Plot'), measureSelect),
-    h('div', { class: 'map-measure' }, h('label', { for: 'chart-max-error' }, 'Max worst error (LBU)'), errorSelect),
+    h('div', { class: 'map-measure' }, h('label', { for: 'chart-max-error' }, 'Worst error (LBU)'), errorSelect),
   );
   const protractorBox = h('div', { class: 'protractor' });
   const mapBox = h('div', { class: 'match-map' });

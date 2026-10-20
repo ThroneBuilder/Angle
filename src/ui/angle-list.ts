@@ -4,6 +4,7 @@ import { formatAngle } from '../geometry/units.ts';
 import type { FilteredAngle } from '../solver/filter.ts';
 import { formatBuildAngle, groupOf, type SolutionGroup } from '../solver/group.ts';
 import type { AngleTenths } from '../types.ts';
+import { collapsible } from './collapsible.ts';
 import { h } from './dom.ts';
 import { holes, spanOf, type LinearSteps } from './span.ts';
 
@@ -36,7 +37,11 @@ export function createAngleList(
   const listbox = h('div', { role: 'listbox', tabindex: 0, 'aria-label': 'Qualifying solutions' });
   const wrap = h('div', { class: 'angle-table-wrap' }, listbox);
   const detail = h('div', { class: 'detail' });
-  container.append(settings, status, wrap, detail);
+  const solutions = collapsible('solutions', 'Solution list');
+  solutions.body.append(wrap);
+  const connections = collapsible('connections', 'Connection list');
+  connections.body.append(detail);
+  container.append(settings, status, solutions.element, connections.element);
 
   let current: AngleListView | null = null;
   let renderedKey = '';

@@ -24,17 +24,13 @@ export function createDrawings(section: HTMLElement) {
         return h(
           'figure',
           { class: 'drawing' },
+          h('figcaption', {}, title),
           h('div', { class: 'drawing-plot' }, svg),
           h(
-            'figcaption',
-            {},
-            h('span', {}, title),
-            h(
-              'span',
-              { class: 'drawing-downloads' },
-              h('button', { type: 'button', onclick: () => void downloadPng(svg, name) }, 'PNG'),
-              h('button', { type: 'button', onclick: () => downloadSvg(svg, name) }, 'SVG'),
-            ),
+            'div',
+            { class: 'drawing-downloads' },
+            h('button', { type: 'button', onclick: () => void downloadPng(svg, name) }, 'PNG'),
+            h('button', { type: 'button', onclick: () => downloadSvg(svg, name) }, 'SVG'),
           ),
         );
       }),

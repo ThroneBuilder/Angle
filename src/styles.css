@@ -488,6 +488,67 @@ progress {
   border-radius: 50%;
 }
 
+.collapsible {
+  margin-bottom: 10px;
+}
+
+.collapsible > summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 0;
+  overflow-wrap: anywhere;
+}
+
+.collapsible > summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.collapsible-body {
+  margin-top: 4px;
+}
+
+.drawing figcaption {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+  overflow-wrap: anywhere;
+}
+
+.drawing .drawing-downloads {
+  margin-top: 6px;
+}
+
+.surface-def {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px 10px;
+  margin: 0 0 12px;
+}
+
+.surface-def > summary {
+  font-size: 0.95rem;
+}
+
+.check-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.check input {
+  min-height: 0;
+}
+
 .view3d-canvas {
   height: 440px;
   border: 1px solid var(--border);
@@ -532,17 +593,6 @@ progress {
   display: block;
   width: 100%;
   height: auto;
-}
-
-.drawing figcaption {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 6px;
-  font-size: 0.85rem;
-  color: var(--muted);
 }
 
 .drawing-downloads {
