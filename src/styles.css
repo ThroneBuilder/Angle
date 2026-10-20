@@ -100,20 +100,54 @@ body {
   font: 15px/1.45 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Header ported from Faceplate: a full-width dark band with the title, tagline, and project link. */
 .site-header {
-  padding: 20px 16px 8px;
+  background: #1a1a2e;
+  color: #ffffff;
+  padding: 1.25rem 16px;
+}
+
+.header-inner {
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.header-left {
+  flex: 1;
+  min-width: 0;
 }
 
 .site-header h1 {
   margin: 0;
   font-size: 1.6rem;
+  letter-spacing: -0.02em;
 }
 
 .tagline {
-  margin: 4px 0 0;
-  color: var(--muted);
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  color: #aaaaaa;
+}
+
+.more-info {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #e87722;
+  text-decoration: none;
+}
+
+.more-info:hover {
+  text-decoration: underline;
+}
+
+.more-info:focus-visible {
+  outline: 2px solid #e87722;
+  outline-offset: 2px;
 }
 
 .layout {
@@ -122,7 +156,7 @@ body {
   gap: 16px;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 8px 16px 32px;
+  padding: 16px 16px 32px;
 }
 
 .layout > section {
