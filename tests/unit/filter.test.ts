@@ -23,7 +23,7 @@ function solution(connections: Connection[], angle = 100): AngleSolution {
   };
 }
 
-const loose: FilterSettings = { toleranceLbu: 1, minConnections: 0, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0 };
+const loose: FilterSettings = { toleranceLbu: 1, minConnections: 0, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0, tessellatedOnly: false };
 
 describe('applyFilters', () => {
   it('drops connections above the tolerance first', () => {
@@ -83,9 +83,9 @@ describe('spacing', () => {
   });
 
   it('qualifies only when the smallest spacing is within the maximum', () => {
-    expect(applyFilters(holes(0, 6), { ...loose, maxSpacing: 5, maxWorstErrorLbu: 0 }, input1d).qualifies).toBe(false);
-    expect(applyFilters(holes(0, 6), { ...loose, maxSpacing: 6, maxWorstErrorLbu: 0 }, input1d).qualifies).toBe(true);
-    expect(applyFilters(holes(0, 6), { ...loose, maxSpacing: 0, maxWorstErrorLbu: 0 }, input1d).qualifies).toBe(true);
+    expect(applyFilters(holes(0, 6), { ...loose, maxSpacing: 5, maxWorstErrorLbu: 0, tessellatedOnly: false }, input1d).qualifies).toBe(false);
+    expect(applyFilters(holes(0, 6), { ...loose, maxSpacing: 6, maxWorstErrorLbu: 0, tessellatedOnly: false }, input1d).qualifies).toBe(true);
+    expect(applyFilters(holes(0, 6), { ...loose, maxSpacing: 0, maxWorstErrorLbu: 0, tessellatedOnly: false }, input1d).qualifies).toBe(true);
   });
 
   it('uses the smallest distance between any two points on an area top', () => {
@@ -94,8 +94,8 @@ describe('spacing', () => {
     const f = applyFilters(s, loose, input2d);
     expect(f.spacingLbu).toBeCloseTo(Math.sqrt(325), 9);
     expect(f.spanLbu).toBe(20);
-    expect(applyFilters(s, { ...loose, maxSpacing: 1, maxWorstErrorLbu: 0 }, input2d).qualifies).toBe(false);
-    expect(applyFilters(s, { ...loose, maxSpacing: 2, maxWorstErrorLbu: 0 }, input2d).qualifies).toBe(true);
+    expect(applyFilters(s, { ...loose, maxSpacing: 1, maxWorstErrorLbu: 0, tessellatedOnly: false }, input2d).qualifies).toBe(false);
+    expect(applyFilters(s, { ...loose, maxSpacing: 2, maxWorstErrorLbu: 0, tessellatedOnly: false }, input2d).qualifies).toBe(true);
   });
 });
 
@@ -104,7 +104,7 @@ describe('maximum worst error', () => {
     const s = solution([conn(0, 0, 0.05), conn(4, 0, 0.18), conn(2, 3, 0.1)]);
     expect(applyFilters(s, { ...loose, maxWorstErrorLbu: 0.15 }, input2d).qualifies).toBe(false);
     expect(applyFilters(s, { ...loose, maxWorstErrorLbu: 0.2 }, input2d).qualifies).toBe(true);
-    expect(applyFilters(s, { ...loose, maxWorstErrorLbu: 0 }, input2d).qualifies).toBe(true);
+    expect(applyFilters(s, { ...loose, maxWorstErrorLbu: 0, tessellatedOnly: false }, input2d).qualifies).toBe(true);
   });
 });
 

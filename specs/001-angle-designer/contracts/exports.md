@@ -5,8 +5,8 @@ Implements FR-019 to FR-023. Every download is generated from one `Build`
 
 ## File names
 
-`angle-{preset|custom}-{angle as 18p3}deg.{ldr|csv|png}`. For example,
-`angle-hybridOnHybrid-18p3deg.ldr`. Drawings add `-top` or `-bottom`, and the 3D view adds `-3d`.
+`angle-{preset|custom}-{build angle as 16p07}deg.{ldr|csv|png}`. For example,
+`angle-hybridOnHybrid-9p15deg.ldr`. Drawings add `-top` or `-bottom`, and the 3D view adds `-3d`.
 
 ## LDraw (`.ldr`)
 

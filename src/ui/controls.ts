@@ -12,6 +12,7 @@ export interface ControlEvents {
   surface(which: 'top' | 'bottom', spec: SurfaceSpec): void;
   placement(mode: PlacementMode): void;
   filters(filters: FilterSettings): void;
+  trim(on: boolean): void;
 }
 
 export interface Controls {
@@ -40,7 +41,9 @@ function fillSteps(select: HTMLSelectElement, choices: readonly StepChoice[], va
 
 function surfaceFieldset(which: 'top' | 'bottom', events: ControlEvents) {
   const label = which === 'top' ? 'Top surface' : 'Bottom surface';
-  const types = SURFACE_TYPE_IDS.filter((id) => which === 'top' || SURFACE_TYPES[id].dimensions === 2);
+  const types = SURFACE_TYPE_IDS.filter((id) =>
+    which === 'top' ? SURFACE_TYPES[id].canBeTop : SURFACE_TYPES[id].dimensions === 2,
+  );
   const id = (part: string) => `${which}-${part}`;
   const typeSelect = h('select', { id: id('type') }, ...types.map((t) => h('option', { value: t }, SURFACE_TYPES[t].name)));
   const sizeX = h('select', { id: id('x') });
@@ -103,13 +106,9 @@ export function createControls(container: HTMLElement, events: ControlEvents): C
   const bottom = surfaceFieldset('bottom', events);
   const configErrors = h('ul', { class: 'errors', role: 'alert' });
 
-  const radio = (mode: PlacementMode, text: string) => {
-    const input = h('input', { type: 'radio', name: 'placement', id: `place-${mode}`, value: mode });
-    input.addEventListener('change', () => input.checked && events.placement(mode));
-    return { input, label: h('label', { for: `place-${mode}` }, input, text) };
-  };
-  const centered = radio('centered', 'Centered');
-  const shifted = radio('shifted', 'Shifted');
+  // Checked = shifted placement: the top may shift so connections need not be centered (slower).
+  const imperfect = h('input', { type: 'checkbox', id: 'allow-imperfect' });
+  imperfect.addEventListener('change', () => events.placement(imperfect.checked ? 'shifted' : 'centered'));
 
   const tolerance = h('input', { id: 'tol', type: 'number', min: 0, max: SOLVE_TOLERANCE_LBU, step: 0.05 });
   const minConnections = h('input', { id: 'min', type: 'number', step: 1 });
@@ -118,6 +117,10 @@ export function createControls(container: HTMLElement, events: ControlEvents): C
   const spacingUnit = h('span', {});
   const spacingUnit2 = h('span', {});
   const filterErrors = h('ul', { class: 'errors', role: 'alert' });
+  const tessellated = h('input', { type: 'checkbox', id: 'tess' });
+  tessellated.addEventListener('change', () => events.filters(readFilters()));
+  const trim = h('input', { type: 'checkbox', id: 'trim' });
+  trim.addEventListener('change', () => events.trim(trim.checked));
   // The maximum worst error is set from the charts toolbar; carry its current value through.
   let maxWorstErrorLbu = 0;
   const readFilters = (): FilterSettings => ({
@@ -126,6 +129,7 @@ export function createControls(container: HTMLElement, events: ControlEvents): C
     minSpacing: Number(minSpacing.value),
     maxSpacing: Number(maxSpacing.value),
     maxWorstErrorLbu,
+    tessellatedOnly: tessellated.checked,
   });
   for (const input of [tolerance, minConnections, minSpacing, maxSpacing]) {
     input.addEventListener('input', () => events.filters(readFilters()));
@@ -143,7 +147,16 @@ export function createControls(container: HTMLElement, events: ControlEvents): C
     top.fieldset,
     bottom.fieldset,
     configErrors,
-    h('fieldset', {}, h('legend', {}, 'Placement'), h('div', { class: 'radio-row' }, centered.label, shifted.label)),
+    h(
+      'fieldset',
+      {},
+      h('legend', {}, 'Placement'),
+      h(
+        'div',
+        { class: 'radio-row' },
+        h('label', { for: 'allow-imperfect', title: 'Shift the top surface off center to find more solutions (slower)' }, imperfect, 'Allow all imperfect'),
+      ),
+    ),
     h(
       'fieldset',
       {},
@@ -151,7 +164,23 @@ export function createControls(container: HTMLElement, events: ControlEvents): C
       h('div', { class: 'field' }, h('label', { for: 'tol' }, `Tolerance per pin (LBU, 0–${SOLVE_TOLERANCE_LBU})`), tolerance),
       h('div', { class: 'field' }, h('label', { for: 'min' }, 'Min. connections'), minConnections),
       spacingRow,
+      h(
+        'div',
+        { class: 'radio-row' },
+        h(
+          'label',
+          { for: 'tess', title: 'Keep only connections in the repeating pattern; drop one-off connections' },
+          tessellated,
+          'Trim tessellated connections',
+        ),
+      ),
       filterErrors,
+    ),
+    h(
+      'fieldset',
+      {},
+      h('legend', {}, 'Build'),
+      h('div', { class: 'radio-row' }, h('label', { for: 'trim' }, trim, 'Trim to connections')),
     ),
   );
 
@@ -166,11 +195,12 @@ export function createControls(container: HTMLElement, events: ControlEvents): C
   return {
     sync(state, cErrors, fErrors) {
       maxWorstErrorLbu = state.filters.maxWorstErrorLbu;
+      trim.checked = state.trim;
+      tessellated.checked = state.filters.tessellatedOnly;
       presetSelect.value = state.preset;
       top.sync(state.config.top);
       bottom.sync(state.config.bottom);
-      centered.input.checked = state.config.placement === 'centered';
-      shifted.input.checked = state.config.placement === 'shifted';
+      imperfect.checked = state.config.placement === 'shifted';
       const topType = SURFACE_TYPES[state.config.top.typeId];
 
       spacingUnit.textContent = topType.countX.plural;

@@ -46,6 +46,10 @@ function validateSurface(label: string, spec: SurfaceSpec): string[] {
 export function validateConfiguration(c: Configuration): string[] {
   const errors = [...validateSurface('Top surface', c.top), ...validateSurface('Bottom surface', c.bottom)];
   const bottom = SURFACE_TYPES[c.bottom.typeId];
+  const top = SURFACE_TYPES[c.top.typeId];
+  if (top && !top.canBeTop) {
+    errors.push(`The top surface can't be a ${top.name}: it has nothing to connect to underneath.`);
+  }
   if (bottom && bottom.dimensions !== 2) {
     errors.push('The bottom surface must be an area (2D) surface.');
   }

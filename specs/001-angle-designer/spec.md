@@ -61,6 +61,11 @@ CSV downloads."
 - Q: How should the protractor show solutions? → A: As a polar wrap of the match map: a dot per
   solution at its build angle, with the plotted measure (spacing by default) as its radius.
 - Q: Can solutions be filtered by error? → A: Yes, by a maximum worst error dropdown.
+- Q: Should area presets default to shifted placement too? → A: Yes. The owner's 9.1° hybrid wall
+  build pivots on a link and appears only with shifted placement at 0.25 LBU.
+- Q: Can one-off connections outside a solution's grid be removed? → A: Yes, with "Trim
+  tessellated connections" (for example, Plate on plate at 33.32°: 8 grid connections kept, 2 near
+  the edge dropped).
 - Q: Can the builder choose the binding-point steps? → A: Yes: width and height step and
   maximum, with choices suited to each surface.
 - Q: How can the builder see why a configuration has many or few solutions? → A: A match map
@@ -268,7 +273,8 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
 - **FR-007**: To test an angle, the top surface's binding points MUST be rotated by that angle
   around the shared center point, and compared with the bottom surface's binding points. This
   centered placement is the default.
-- **FR-007a**: The builder MUST be able to turn on shifted placement. With it on, the page MUST
+- **FR-007a**: The builder MUST be able to turn on shifted placement (the "Allow all imperfect"
+  checkbox). With it on, the page MUST
   also look for a sideways offset of the rotated top surface that gives more connections, or
   connections with smaller errors. No connection is required to line up exactly. The offset
   itself is part of the result, so every connection's error is measured after the shift and
@@ -308,6 +314,11 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
 - **FR-011f**: The builder MUST be able to set a maximum worst error, chosen from the error-band
   edges below the tolerance (or All). Solutions whose worst kept error is above it MUST be hidden
   from the list, the protractor, and the match map alike, and the choice is saved in the link.
+- **FR-011g**: The builder MUST be able to "Trim tessellated connections": keep only the connections
+  in the solution's repeating pattern (connections that differ by whole multiples of the same one or
+  two step vectors on both surfaces), dropping one-off connections. A solution with no repeating
+  step has no connections left and does not qualify. It is applied after the tolerance and before
+  spacing, and saved in the link.
 - **FR-011d**: For a linear top, each solution MUST show the vector from the first to the last
   connected hole: dx in studs and dy in bricks for walls (so 0.3 and 0.7 are one and two plates)
   or in studs for plates, the hole span, and the straight-line length in holes.
@@ -431,8 +442,8 @@ LDraw viewer. Confirm the CSV part and color counts match the parts in the LDraw
 - **Tolerance**: The default is 0.25 LBU per pin. That matches the owner's verified builds, which
   allowed 0.5 LBU of liftarm length error on one pin (`$tolerance = 0.05` in
   `PythagoreanTriples.ps1`). It is tighter than the 0.4 LBU used in `DoubleAngles.ps1`.
-- **Placement defaults**: Linear presets (Brick on plate, Technic on wall) default to shifted
-  placement, and area presets to centered. A custom link with no placement follows the same rule.
+- **Placement defaults**: Every preset defaults to shifted placement, since the owner's builds,
+  including wall-on-wall, pivot on a link. A custom link with no placement is shifted too.
 - **Wall height**: The 132 LBU Technic wall is 12 bricks (144 LBU) minus half a brick at each edge
   for the gap span.
 - **Angle range**: 0.1° to 89.9° only. Other angles are mirror images of these.

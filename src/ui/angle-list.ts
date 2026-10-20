@@ -16,6 +16,8 @@ export interface AngleListView {
   readonly selected: AngleTenths | null;
   readonly shifted: boolean;
   readonly toleranceLbu: number;
+  /** Center the selected row (selection came from a chart) instead of scrolling it just into view. */
+  readonly centerSelection: boolean;
 }
 
 export interface AngleList {
@@ -38,6 +40,21 @@ export function createAngleList(
 
   let current: AngleListView | null = null;
   let renderedKey = '';
+  let scrolledTo = '';
+
+  /** Scroll only the list's own box (never the page): center the row, or bring it just into view. */
+  function scrollRow(row: HTMLElement, center: boolean) {
+    const box = wrap.getBoundingClientRect();
+    const r = row.getBoundingClientRect();
+    const header = listbox.firstElementChild?.getBoundingClientRect().height ?? 0;
+    if (center) {
+      wrap.scrollTop += r.top - box.top - (wrap.clientHeight - r.height + header) / 2;
+    } else if (r.top < box.top + header) {
+      wrap.scrollTop -= box.top + header - r.top;
+    } else if (r.bottom > box.bottom) {
+      wrap.scrollTop += r.bottom - box.bottom;
+    }
+  }
 
   const move = (delta: number | 'home' | 'end') => {
     const groups = current?.groups;
@@ -139,8 +156,11 @@ export function createAngleList(
       listbox.removeAttribute('aria-activedescendant');
     } else {
       listbox.setAttribute('aria-activedescendant', selectedId);
-      document.getElementById(selectedId)?.scrollIntoView({ block: 'nearest' });
+      // Scroll only when the selection changes, so later re-renders don't fight the builder's scrolling.
+      const row = document.getElementById(selectedId);
+      if (row && selectedId !== scrolledTo) scrollRow(row, view.centerSelection);
     }
+    scrolledTo = selected ? selectedId : '';
   }
 
   function renderDetail(view: AngleListView) {

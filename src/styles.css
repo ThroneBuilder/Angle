@@ -281,8 +281,9 @@ progress {
   padding: 12px 0;
 }
 
+/* Header plus 10 rows: each row is a 20px line, 12px padding, and a 1px border. */
 .angle-table-wrap {
-  max-height: 60vh;
+  max-height: calc(11 * 33px);
   overflow: auto;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -297,6 +298,7 @@ progress {
   grid-template-columns: 5.5em 3.5em 4.5em 4.2em 3.5em 1fr;
   gap: 8px;
   padding: 6px 10px;
+  line-height: 20px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   font-variant-numeric: tabular-nums;
@@ -484,6 +486,58 @@ progress {
   width: 10px;
   height: 10px;
   border-radius: 50%;
+}
+
+.drawings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.drawing {
+  margin: 0;
+  min-width: 0;
+}
+
+.drawing-plot {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: auto;
+  max-height: 70vh;
+  background: #ffffff;
+}
+
+.surface-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.drawing figcaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.drawing-downloads {
+  display: flex;
+  gap: 6px;
+}
+
+.build-warnings {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.build-warnings:empty {
+  display: none;
 }
 
 .detail h3 {

@@ -36,7 +36,7 @@ describe('DoubleAngles.ps1 (centered, tolerance 0.4)', () => {
   // Ad-hoc grid with the script's steps, independent of the product's surface types.
   const grid: GridSpec = { dimensions: 2, ...fixture.grid };
   const input: SolverInput = { top: grid, bottom: grid, placement: 'centered' };
-  const filters: FilterSettings = { toleranceLbu: fixture.toleranceLbu, minConnections: 3, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0 };
+  const filters: FilterSettings = { toleranceLbu: fixture.toleranceLbu, minConnections: 3, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0, tessellatedOnly: false };
   const expected = new Map(fixture.angles.map((a) => [a.k, a.pairs.map(key).sort()]));
   const known = new Set(KNOWN_DIFFERENCES.map((d) => d.k));
 
@@ -65,7 +65,7 @@ describe('PythagoreanTriples.ps1 whole-step run (owner verified)', () => {
       placement: 'shifted' as const,
     };
     const input = toSolverInput(config);
-    const filters: FilterSettings = { toleranceLbu: 0.25, minConnections: 2, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0 };
+    const filters: FilterSettings = { toleranceLbu: 0.25, minConnections: 2, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0, tessellatedOnly: false };
     const qualifying = qualifyingAngles({ config, solutions: solveRange(input, 1, 899), complete: true }, filters, input);
     const built = groupSolutions(qualifying, input).map((g) => Number(g.buildDeg.toFixed(1)));
     expect(built).toEqual([0, ...SCRIPT_ANGLES]);
@@ -92,7 +92,7 @@ describe.each([
     const k = Math.round(row.angle * 10);
     const solution = pickForTolerance(solveAngle(input, k), 0.5);
     expect(solution).not.toBeNull();
-    const { kept } = applyFilters(solution!, { toleranceLbu: 0.5, minConnections: 2, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0 }, input);
+    const { kept } = applyFilters(solution!, { toleranceLbu: 0.5, minConnections: 2, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0, tessellatedOnly: false }, input);
     expect(kept.length).toBeGreaterThanOrEqual(2);
   });
 });

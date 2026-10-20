@@ -57,6 +57,10 @@ Each checkpoint is done in a real browser (Constitution VI), and its outcome is 
 
 ### US3: Surface drawings (P3)
 
+0. Select a solution: a Surfaces section appears with the bottom and top drawn as LEGO parts in
+   catalog colors, every connection ringed in red, risers or pins at the connections, and any
+   build warnings listed above the drawings.
+
 1. For an angle with half-step connections in each preset, the drawings show the right view,
    highlighted connections, and offset parts (FR-016, FR-017).
 2. Download PNG and SVG images. They open and match the screen (FR-019).

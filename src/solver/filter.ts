@@ -1,7 +1,9 @@
 // Filters applied to stored results, never re-solving (research R5, R15; FR-008, FR-011).
-// Order: tolerance, spacing, then the qualifying rule (including the maximum worst error).
+// Order: tolerance, tessellation (optional), spacing, then the qualifying rule (including the
+// maximum worst error).
 import type { AngleSolution, Connection, FilterSettings, SolveResult, SolverInput } from '../types.ts';
 import { tierIndexFor } from './constants.ts';
+import { findTessellation } from './tessellation.ts';
 
 export interface FilteredAngle {
   readonly solution: AngleSolution;
@@ -66,7 +68,8 @@ function applySpacing(connections: readonly Connection[], minSpacingLbu: number,
 
 export function applyFilters(solution: AngleSolution, filters: FilterSettings, input: SolverInput): FilteredAngle {
   const withinTolerance = solution.connections.filter((c) => c.errorLbu <= filters.toleranceLbu);
-  const { kept, spacing: spacingLbu, span: spanLbu } = applySpacing(withinTolerance, filters.minSpacing * 10, input.top);
+  const pattern = filters.tessellatedOnly ? (findTessellation(withinTolerance)?.members ?? []) : withinTolerance;
+  const { kept, spacing: spacingLbu, span: spanLbu } = applySpacing(pattern, filters.minSpacing * 10, input.top);
 
   const linear = input.top.dimensions === 1;
   const minimum = Math.max(filters.minConnections, structuralMinimumFor(input.top.dimensions));

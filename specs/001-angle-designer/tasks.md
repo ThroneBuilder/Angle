@@ -336,6 +336,12 @@ _Protractor marks (T036–T038) are drawn per solution group (T069), at each gro
   in `src/solver/filter.ts`, chosen from a toolbar dropdown of error-band edges (`maxErrorChoices`),
   saved as the `emax` link key, and shown in the settings line. Tests in filter, charts, and url-state.
 
+- [X] T081 [US2] "Trim tessellated connections" filter (FR-011g): `src/solver/tessellation.ts`
+  (`findTessellation`: repeating integer step vectors on both surfaces, largest connected lattice
+  group), applied in `src/solver/filter.ts` before spacing, checkbox in Filters, `tess` link key.
+  Tests in `tests/unit/tessellation.test.ts`. Effect at defaults: Brick on plate 79 → 18 solutions,
+  Plate on plate 673 → 267, Liftarm on wall 69 → 17, Hybrid wall 804 → 541.
+
 **Checkpoint**: quickstart.md US2 passes in the browser. US1 still passes.
 
 ---
@@ -349,39 +355,39 @@ parts, and connector positions, plus image downloads and the trim option.
 
 ### Parts catalog
 
-- [ ] T039 [US3] Write `scripts/build-catalog.ts` (as in Mountain's catalog; research R8). Download
+- [X] T039 [US3] Write `scripts/build-catalog.ts` (as in Mountain's catalog; research R8). Download
   the Rebrickable `colors`, `sets`, `inventories`, and `inventory_parts` CSVs; record each URL's
   SHA-256. Keep a part and color only if they appear in a set from the current or previous year.
   Write `src/catalog/lego-angle-<YYYY-MM-DD>.json` in the data-model `Catalog` shape, limited to
   the R8 candidate parts and the default colors. Print a warning for any candidate part or default
   color that is not current.
-- [ ] T040 [US3] Run `pnpm catalog`, commit the JSON, and record any non-current parts in this
+- [X] T040 [US3] Run `pnpm catalog`, commit the JSON, and record any non-current parts in this
   file's checkpoint notes with the substitute chosen (Constitution IV).
-- [ ] T041 [P] [US3] Write `tests/unit/catalog.test.ts`, then `src/catalog/catalog.ts`:
+- [X] T041 [P] [US3] Write `tests/unit/catalog.test.ts`, then `src/catalog/catalog.ts`:
   `loadCatalog()`, `part(no)`, `isCurrent(no, colorId)`, and `colorFor(no, preferredColorId)`,
   which falls back to the first current color in name order. Tests use a small fixture catalog.
 
 ### Build model
 
-- [ ] T042 [P] [US3] Write `tests/unit/fractions.test.ts` for research R9. Plate at a half
+- [X] T042 [P] [US3] Write `tests/unit/fractions.test.ts` for research R9. Plate at a half
   position adds no parts (the riser handles it). A Technic brick at an X half step adds one 6541
   part at the right position. A Technic wall at a Y position off the 12 LBU boundary adds plates
   above or below. A hybrid wall at every 4 LBU uses the 1 × 2 or 1 × 1 Technic piece with plates,
   as in the spec table.
-- [ ] T043 [P] [US3] Write `tests/unit/connectors.test.ts` for FR-020a and research R8. Hole to
+- [X] T043 [P] [US3] Write `tests/unit/connectors.test.ts` for FR-020a and research R8. Hole to
   hole gives 2780. A stud at a whole position gives 4073. A half step in one direction gives 15573,
   rotated along that direction. A half step in both gives 87580. Overlapping riser footprints add
   a warning.
-- [ ] T044 [P] [US3] Write `tests/unit/trim.test.ts` for FR-020b. Trimming shrinks each surface to
+- [X] T044 [P] [US3] Write `tests/unit/trim.test.ts` for FR-020b. Trimming shrinks each surface to
   the smallest standard size covering all kept connections, rounding up to the next standard size.
   Walls shorten their layers and drop layers that hold no connections. The angle, placement, and
   connections do not change.
-- [ ] T045 [US3] Fill in the `fractionRules`, `baseParts` (layout of each surface's base parts:
+- [X] T045 [US3] Fill in the `fractionRules`, `baseParts` (layout of each surface's base parts:
   for example 12 × 3703 for technicWall:150x132; for hybridWall, 4282 / 3703 / 4282 per 20 LBU
   layer), and `drawing` fields in `src/surfaces/surface-types.ts`, using the R8 part numbers.
-- [ ] T046 [US3] Implement `src/build/fractions.ts` (makes T042 pass), `src/build/connectors.ts`
+- [X] T046 [US3] Implement `src/build/fractions.ts` (makes T042 pass), `src/build/connectors.ts`
   (makes T043 pass), and `src/build/trim.ts` (makes T044 pass).
-- [ ] T047 [US3] Implement `src/build/build.ts`: `makeBuild(solution, filters, options, config,
+- [X] T047 [US3] Implement `src/build/build.ts`: `makeBuild(solution, filters, options, config,
   catalog): Build`. Use the kept connections only. Put each surface's parts in its own coordinates,
   colored with the defaults (bottom light bluish gray, top dark bluish gray, connectors black,
   offset parts tan, via `colorFor`). Copy in `catalogVersion` and warnings. Add
@@ -390,7 +396,7 @@ parts, and connector positions, plus image downloads and the trim option.
 
 ### Drawings
 
-- [ ] T048 [US3] Implement `src/render/surface-svg.ts`: `renderSurface(build, which: 'top' |
+- [X] T048 [US3] Implement `src/render/surface-svg.ts`: `renderSurface(build, which: 'top' |
   'bottom'): SVGSVGElement`, drawn from the surface type's `drawing` and the Build. Brick: a top
   view with a row of studs. Liftarm: a rounded bar with a row of holes. Technic: a side view with
   holes on the edge. Plate and Baseplate: a top view with a stud grid. Technic wall: a side-view
@@ -398,10 +404,10 @@ parts, and connector positions, plus image downloads and the trim option.
   Highlight the binding points used, and draw offset parts and connectors in their catalog
   colors. Convert top-left origin and pixels here only, through `units.ts`. Use a `<title>` for
   accessibility.
-- [ ] T049 [US3] Implement `src/export/image.ts`: `downloadSvg(svg, name)`, and
+- [X] T049 [US3] Implement `src/export/image.ts`: `downloadSvg(svg, name)`, and
   `downloadPng(svg, name)` (2× scale through an off-screen canvas), using the file names in
   `contracts/exports.md`.
-- [ ] T050 [US3] Add a "Trim to connections" checkbox to `src/ui/controls.ts`, and the `trim` key
+- [X] T050 [US3] Add a "Trim to connections" checkbox to `src/ui/controls.ts`, and the `trim` key
   to `src/state/url-state.ts` (extend T023 with a trim round-trip). Wire up `src/main.ts` so that
   selecting an angle builds the Build and renders both drawings, with PNG/SVG download buttons,
   within 1 s (SC-003).
@@ -522,6 +528,29 @@ wall, dx 8.5, dy 7.0, 12 holes, true angle 44.661°. PythagoreanTriples.ps1 keep
 of length against 0.5); the app's best pin error is 0.2518 LBU at 44.7°, so it appears only at a
 tolerance of 0.26 or more. The owner chose to leave this as is rather than refit errors at the
 build angle.
+
+### US3 implementation notes (2026-10-19)
+
+- **Catalog (T039–T040):** `src/catalog/lego-angle-2026-10-19.json` from Rebrickable (2025–2026
+  sets): 47 parts, 64 colors, all candidates current. Substitutes for parts not in recent sets or
+  not under the LDraw number: friction pin 2780 → **61332** (current pin without center slots),
+  round plate 1 x 1 4073 → **6141** (Rebrickable's number), 15-hole thick liftarm 64871 → **32278**.
+  Several default colors are not current for every part (for example tan Technic bricks); the build
+  substitutes the first current color by name. **Check at US5:** LDraw file names for 61332, 6141,
+  and 32278 when writing `.ldr` files.
+- **Hybrid wall plates** are 1 x N plates (1 stud deep, matching the 1 x 16 Technic brick), not the
+  2 x 16 plate (4282) research R8 first listed.
+- **Native positions (research R9):** Technic holes sit between studs (`nativeXPhase` 5); a 1 x 1
+  Technic brick with a hole makes the stud-center positions, raised on 1 x 1 plates for heights
+  between hole rows. Marked approximate in every Technic build until T051.
+- **Owner requests during US3:** preset renamed "Liftarm on wall"; Shifted shown as "Shifted (more
+  but slower)"; the baseplate can't be a top surface (`canBeTop`), since it has nothing to connect
+  to underneath; every preset defaults to shifted placement.
+- **Owner review of the drawings:** connections fill their stud or hole red (no ring); both surfaces
+  are dark bluish gray and fractional adjustments (offset parts and risers) light bluish gray; the
+  placement control is a single "Allow all imperfect" checkbox (checked = shifted).
+- **Drawings** have no automated DOM test (no browser test runner, research R14); they are checked
+  by hand in quickstart US3.
 
 ### T035 measurements (Node 24, all 899 angles; browser times still to be checked)
 

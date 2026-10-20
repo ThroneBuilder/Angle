@@ -9,7 +9,11 @@ import { effectiveSteps, SURFACE_TYPES } from './surfaces/surface-types.ts';
 import { structuralMinimum, validateConfiguration, validateFilters } from './surfaces/validate.ts';
 import type { AngleTenths, Configuration, FilterSettings, SolveResult, SurfaceSpec } from './types.ts';
 import { createCharts } from './render/charts.ts';
+import { makeBuild } from './build/build.ts';
+import { CATALOG } from './catalog/catalog.ts';
+import { groupOf } from './solver/group.ts';
 import { createAngleList } from './ui/angle-list.ts';
+import { createDrawings } from './ui/drawings.ts';
 import type { LinearSteps } from './ui/span.ts';
 import { createControls } from './ui/controls.ts';
 import { createNotices } from './ui/notices.ts';
@@ -23,9 +27,14 @@ let groups: SolutionGroup[] | null = null;
 
 const notices = createNotices(document.getElementById('notices')!);
 const client = new SolverClient();
+/** True when the next selection came from a chart, so the list centers that row. */
+let centerNext = false;
 const charts = createCharts(
   document.getElementById('charts')!,
-  (angle) => select(angle),
+  (angle) => {
+    centerNext = true;
+    select(angle);
+  },
   (maxWorstErrorLbu) => update({ ...state, filters: { ...state.filters, maxWorstErrorLbu } }, false),
 );
 
@@ -55,7 +64,12 @@ const controls = createControls(document.getElementById('controls')!, {
     }
     update({ ...state, filters }, false);
   },
+  trim(on) {
+    update({ ...state, trim: on }, false);
+  },
 });
+
+const drawings = createDrawings(document.getElementById('drawings')!);
 
 const list = createAngleList(
   document.getElementById('angle-list')!,
@@ -118,6 +132,7 @@ function settingsLine(s: AppLinkState): string {
     `min ${f.minConnections}`,
     `spacing ${f.minSpacing}–${f.maxSpacing > 0 ? f.maxSpacing : 'any'}`,
     ...(f.maxWorstErrorLbu > 0 ? [`max error ${f.maxWorstErrorLbu}`] : []),
+    ...(f.tessellatedOnly ? ['tessellated only'] : []),
   ].join(' · ');
 }
 
@@ -188,6 +203,21 @@ function render(): void {
     linear,
     unitLabel,
   });
+  const group = groupOf(groups ?? [], state.angle);
+  const chosen = group?.members.find((m) => m.solution.angle === state.angle) ?? group?.best;
+  drawings.render(
+    group && chosen
+      ? makeBuild({
+          solution: chosen,
+          buildDeg: group.buildDeg,
+          config: state.config,
+          filters: state.filters,
+          options: { trimToConnections: state.trim },
+          catalog: CATALOG,
+        })
+      : null,
+    state.preset,
+  );
   list.render({
     settings: settingsLine(state),
     linear,
@@ -196,7 +226,9 @@ function render(): void {
     selected: state.angle,
     shifted: state.config.placement === 'shifted',
     toleranceLbu: state.filters.toleranceLbu,
+    centerSelection: centerNext,
   });
+  centerNext = false;
 }
 
 window.addEventListener('popstate', () => {

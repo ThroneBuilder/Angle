@@ -18,15 +18,15 @@ export type PartRef = string;
 /** Catalog color id. */
 export type ColorRef = number;
 
-/** How a surface is drawn in 2D. Filled in by User Story 3. */
-export interface DrawingStyle {
-  readonly kind: string;
-}
+/** How a surface's base parts are laid out (src/build/layout.ts). */
+export type LayoutKind = 'brickRow' | 'liftarm' | 'technicRow' | 'plate' | 'baseplate' | 'technicWall' | 'hybridWall';
 
-/** Parts that create a position between whole steps. Filled in by User Story 3. */
-export interface FractionRule {
-  readonly kind: string;
-}
+/**
+ * How a binding point between whole positions is made (FR-017, research R9): `none` when every
+ * point is a whole position, `riser` when the stud connector itself makes the offset (jumper
+ * plates), `technic1x1` when a 1 x 1 Technic brick with a hole, raised on plates, makes it.
+ */
+export type OffsetRule = 'none' | 'riser' | 'technic1x1';
 
 /** A binding-point step the builder can choose, such as a whole or a half stud. */
 export interface StepChoice {
@@ -51,6 +51,8 @@ export interface SurfaceType {
   readonly id: SurfaceTypeId;
   readonly name: string;
   readonly dimensions: 1 | 2;
+  /** False when the underside has nothing to connect to (a baseplate), so it can't be the top. */
+  readonly canBeTop: boolean;
   /** Default steps; the builder may pick another from the step choices. */
   readonly stepX: number;
   readonly maxX: number;
@@ -66,9 +68,16 @@ export interface SurfaceType {
   readonly edgeOffset: number;
   readonly view: 'top' | 'side';
   readonly connectorKind: 'stud' | 'hole';
-  readonly drawing: DrawingStyle;
-  readonly fractionRules: readonly FractionRule[];
-  readonly baseParts: readonly PartRef[];
+  readonly layout: LayoutKind;
+  readonly offsetRule: OffsetRule;
+  /**
+   * Whole (native) positions in local LBU from the first binding point (a stud center): across,
+   * every 10 starting at `nativeXPhase` (5 for Technic holes, which sit between studs); up, every
+   * `nativeYPeriod` starting at `nativeYPhase` (10 for studs, 12 for brick rows, 20 for hybrid layers).
+   */
+  readonly nativeXPhase: number;
+  readonly nativeYPeriod: number;
+  readonly nativeYPhase: number;
 }
 
 export interface SurfaceSpec {
@@ -101,6 +110,8 @@ export interface FilterSettings {
   readonly maxSpacing: number;
   /** Hide solutions whose worst error is above this, in LBU; 0 shows all (within tolerance). */
   readonly maxWorstErrorLbu: number;
+  /** Keep only connections in the solution's repeating pattern (FR-011g). */
+  readonly tessellatedOnly: boolean;
 }
 
 /** A surface's binding-point grid, independent of surface type (keeps the solver generic). */
@@ -160,19 +171,36 @@ export interface BuildOptions {
   readonly trimToConnections: boolean;
 }
 
-export interface Connector {
-  readonly at: Connection;
-  readonly part: PartRef;
-  readonly rotationDeg: number;
-}
+export type PartKind = 'brick' | 'plate' | 'technic' | 'liftarm' | 'baseplate' | 'pin' | 'riser' | 'offset';
 
+/**
+ * A part in a surface's own coordinates (LBU): x and y are the part's center in the surface
+ * plane, measured from the surface's first binding point (y up); z is its height above the
+ * surface's base. Width and height are its extent in the surface plane, for drawing.
+ */
 export interface PlacedPart {
   readonly part: PartRef;
+  readonly kind: PartKind;
   readonly x: number;
   readonly y: number;
   readonly z: number;
+  readonly widthLbu: number;
+  readonly heightLbu: number;
   readonly rotationDeg: number;
   readonly color: ColorRef;
+}
+
+export interface Connector {
+  readonly at: Connection;
+  readonly placed: PlacedPart;
+}
+
+/** A surface as built: its (possibly trimmed) size, and where it starts in the original grid. */
+export interface BuiltSurface {
+  readonly spec: SurfaceSpec;
+  /** Grid index of the original surface at this surface's first binding point. */
+  readonly offsetI: number;
+  readonly offsetJ: number;
 }
 
 export interface Build {
@@ -180,23 +208,35 @@ export interface Build {
   readonly filters: FilterSettings;
   readonly options: BuildOptions;
   readonly angle: AngleTenths;
+  readonly buildDeg: number;
   readonly placement: Placement;
   readonly connections: readonly Connection[];
+  readonly bottom: BuiltSurface;
+  readonly top: BuiltSurface;
+  /** Surface parts plus offset parts, in each surface's own coordinates. */
   readonly bottomParts: readonly PlacedPart[];
   readonly topParts: readonly PlacedPart[];
+  /** In bottom-surface coordinates. */
   readonly connectors: readonly Connector[];
   readonly catalogVersion: string;
   readonly warnings: readonly string[];
 }
 
+export interface CatalogPart {
+  readonly name: string;
+  readonly ldrawFile: string;
+  readonly colors: readonly ColorRef[];
+}
+
+export interface CatalogColor {
+  readonly name: string;
+  readonly ldrawCode: number;
+  readonly rgb: string;
+}
+
 export interface Catalog {
   readonly version: string;
   readonly snapshotDate: string;
-  readonly source: { readonly provider: string; readonly url: string; readonly sha256: string };
-  readonly parts: Readonly<
-    Record<PartRef, { readonly name: string; readonly ldrawFile: string; readonly colors: readonly ColorRef[] }>
-  >;
-  readonly colors: Readonly<
-    Record<ColorRef, { readonly name: string; readonly ldrawCode: number; readonly rgb: string }>
-  >;
+  readonly parts: Readonly<Record<PartRef, CatalogPart>>;
+  readonly colors: Readonly<Record<string, CatalogColor>>;
 }

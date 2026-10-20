@@ -69,7 +69,7 @@ describe('writeState', () => {
           const state: AppLinkState = {
             preset,
             config: { ...PRESETS[preset].config, placement },
-            filters: { ...PRESETS[preset].filters, toleranceLbu: 0.35, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0 },
+            filters: { ...PRESETS[preset].filters, toleranceLbu: 0.35, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0, tessellatedOnly: false },
             trim: angle !== null,
             angle,
           };
@@ -85,7 +85,7 @@ describe('writeState', () => {
     const state: AppLinkState = {
       preset: 'custom',
       config: { top: { typeId: 'technic', sizeX: 75 }, bottom: { typeId: 'baseplate', sizeX: 310, sizeY: 200 }, placement: 'shifted' },
-      filters: { toleranceLbu: 0, minConnections: 5, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0 },
+      filters: { toleranceLbu: 0, minConnections: 5, minSpacing: 0, maxSpacing: 0, maxWorstErrorLbu: 0, tessellatedOnly: false },
       trim: true,
       angle: 7,
     };
@@ -100,7 +100,7 @@ describe('writeState', () => {
         bottom: { typeId: 'technicWall', sizeX: 150, sizeY: 132, stepX: 10, stepY: 12 },
         placement: 'shifted',
       },
-      filters: { toleranceLbu: 0.25, minConnections: 2, minSpacing: 4, maxSpacing: 12, maxWorstErrorLbu: 0 },
+      filters: { toleranceLbu: 0.25, minConnections: 2, minSpacing: 4, maxSpacing: 12, maxWorstErrorLbu: 0, tessellatedOnly: false },
       trim: false,
       angle: null,
     };
@@ -129,6 +129,6 @@ describe('writeState', () => {
       trim: false,
       angle: 183,
     });
-    expect(query).toBe('?v=1&preset=hybridOnHybrid&tol=0.25&place=c&min=3&smin=2&smax=0&emax=0&trim=0&a=183');
+    expect(query).toBe('?v=1&preset=hybridOnHybrid&tol=0.25&place=s&min=3&smin=2&smax=0&emax=0&tess=0&trim=0&a=183');
   });
 });

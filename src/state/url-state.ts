@@ -106,10 +106,8 @@ export function readState(search: string): { state: AppLinkState; replaced: stri
   const top = surface('top');
   const bottom = surface('bottom');
   const placeText = q.get('place');
-  // Default placement follows the presets' rule: linear tops shifted, area tops centered.
-  let placement = custom
-    ? SURFACE_TYPES[top.typeId].dimensions === 1 ? ('shifted' as const) : ('centered' as const)
-    : base.config.placement;
+  // Default placement follows the presets: shifted.
+  let placement = custom ? ('shifted' as const) : base.config.placement;
   if (placeText === 's') placement = 'shifted';
   else if (placeText === 'c') placement = 'centered';
   else if (placeText !== null) replaced.push('place');
@@ -121,7 +119,7 @@ export function readState(search: string): { state: AppLinkState; replaced: stri
   const minimum = structuralMinimum(SURFACE_TYPES[top.typeId]);
   const defaults: FilterSettings =
     preset === 'custom'
-      ? { toleranceLbu: DEFAULT_TOLERANCE_LBU, minConnections: minimum, minSpacing: DEFAULT_MIN_SPACING, maxSpacing: 0, maxWorstErrorLbu: 0 }
+      ? { toleranceLbu: DEFAULT_TOLERANCE_LBU, minConnections: minimum, minSpacing: DEFAULT_MIN_SPACING, maxSpacing: 0, maxWorstErrorLbu: 0, tessellatedOnly: false }
       : base.filters;
 
   let toleranceLbu = defaults.toleranceLbu;
@@ -159,6 +157,11 @@ export function readState(search: string): { state: AppLinkState; replaced: stri
     if (v !== null && v >= 0) maxWorstErrorLbu = v;
     else replaced.push('emax');
   }
+  let tessellatedOnly = defaults.tessellatedOnly;
+  const tess = q.get('tess');
+  if (tess === '1') tessellatedOnly = true;
+  else if (tess === '0') tessellatedOnly = false;
+  else if (tess !== null) replaced.push('tess');
   let trim = false;
   const trimText = q.get('trim');
   if (trimText === '1') trim = true;
@@ -172,12 +175,12 @@ export function readState(search: string): { state: AppLinkState; replaced: stri
   }
 
   return {
-    state: { preset, config, filters: { toleranceLbu, minConnections, minSpacing, maxSpacing, maxWorstErrorLbu }, trim, angle },
+    state: { preset, config, filters: { toleranceLbu, minConnections, minSpacing, maxSpacing, maxWorstErrorLbu, tessellatedOnly }, trim, angle },
     replaced,
   };
 }
 
-/** Keys always in the order v, preset, top, bottom, tol, place, min, smin, smax, emax, trim, a. */
+/** Keys always in the order v, preset, top, bottom, tol, place, min, smin, smax, emax, tess, trim, a. */
 export function writeState(state: AppLinkState): string {
   const parts: [string, string][] = [['v', String(LINK_VERSION)]];
   const named = state.preset !== 'custom' && matchesPreset(state.config, state.preset);
@@ -194,6 +197,7 @@ export function writeState(state: AppLinkState): string {
   parts.push(['smin', num(state.filters.minSpacing)]);
   parts.push(['smax', num(state.filters.maxSpacing)]);
   parts.push(['emax', num(state.filters.maxWorstErrorLbu)]);
+  parts.push(['tess', state.filters.tessellatedOnly ? '1' : '0']);
   parts.push(['trim', state.trim ? '1' : '0']);
   if (state.angle !== null) parts.push(['a', String(state.angle)]);
   return '?' + parts.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');

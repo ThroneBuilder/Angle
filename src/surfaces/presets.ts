@@ -23,12 +23,13 @@ function preset(id: PresetId, name: string, config: Configuration): Preset {
       minSpacing: DEFAULT_MIN_SPACING,
       maxSpacing: 0,
       maxWorstErrorLbu: 0,
+      tessellatedOnly: false,
     },
   };
 }
 
-// Linear tops default to shifted placement, so a connection can anchor at any hole, as in the
-// owner's builds; area tops default to centered, as in DoubleAngles.ps1.
+// Every preset defaults to shifted placement, so the build can pivot on any link, as the owner's
+// builds do (including wall-on-wall builds made with DoubleAngles.ps1).
 export const PRESETS: Readonly<Record<PresetId, Preset>> = {
   brickOnPlate: preset('brickOnPlate', 'Brick on plate', {
     top: { typeId: 'brick', sizeX: 150 },
@@ -38,9 +39,9 @@ export const PRESETS: Readonly<Record<PresetId, Preset>> = {
   plateOnPlate: preset('plateOnPlate', 'Plate on plate', {
     top: { typeId: 'plate', sizeX: 150, sizeY: 150 },
     bottom: { typeId: 'plate', sizeX: 150, sizeY: 150 },
-    placement: 'centered',
+    placement: 'shifted',
   }),
-  technicOnWall: preset('technicOnWall', 'Technic on wall', {
+  technicOnWall: preset('technicOnWall', 'Liftarm on wall', {
     top: { typeId: 'liftarm', sizeX: 140 },
     bottom: { typeId: 'technicWall', sizeX: 150, sizeY: 132 },
     placement: 'shifted',
@@ -48,7 +49,7 @@ export const PRESETS: Readonly<Record<PresetId, Preset>> = {
   hybridOnHybrid: preset('hybridOnHybrid', 'Hybrid wall on hybrid wall', {
     top: { typeId: 'hybridWall', sizeX: 150, sizeY: 108 },
     bottom: { typeId: 'hybridWall', sizeX: 150, sizeY: 108 },
-    placement: 'centered',
+    placement: 'shifted',
   }),
 };
 

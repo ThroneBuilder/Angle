@@ -185,6 +185,10 @@ current, the build step reports it and a current substitute is chosen.
 | Half-step hole offset | Technic brick 1 × 1 with hole (6541) |
 | Extra height (walls) | Plate 1 × 1 (3024) / Plate 1 × 2 (3023) |
 
+**Substitutes found by the catalog script (2026-10-19):** friction pin 2780 → 61332, round plate
+1 x 1 4073 → 6141, 15-hole thick liftarm 64871 → 32278. Hybrid wall plates are 1 x N plates
+(3024 … 60479), not 4282. The full candidate list is `src/catalog/candidates.ts`.
+
 The spec's table says "32x31 Baseplate", but its maximum (310 × 310 LBU) matches a 32 × 32
 baseplate, so 32 × 32 is used. The owner should confirm this.
 
