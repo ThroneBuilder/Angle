@@ -6,8 +6,9 @@ to 89.9° where studs or holes on both surfaces line up within a pin's tolerance
 build and shows it in 3D.
 
 **Will be live at [angle.thronebuilder.com](https://angle.thronebuilder.com)** · Third in a series
-of LEGO projects alongside [Faceplate](https://faceplate.me) (face mosaics) and Mountain
-(mountain rendering).
+of [ThroneBuilder](https://thronebuilder.com) LEGO projects alongside the
+[Faceplate Designer](https://faceplate.thronebuilder.com) (face mosaics) and the
+[Mountain Designer](https://mountain.thronebuilder.com) (mountain rendering).
 
 ## Features
 - **Presets and custom surfaces:** Brick on plate, Plate on plate, Liftarm on wall, and Hybrid wall

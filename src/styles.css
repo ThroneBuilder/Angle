@@ -113,7 +113,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
 }
 
 .header-left {
@@ -143,6 +144,56 @@ body {
 
 .more-info:hover {
   text-decoration: underline;
+}
+
+/* Sites list, as in Faceplate's GalleryNav. */
+.site-nav {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.8rem;
+}
+
+.site-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.group-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.65rem;
+  opacity: 0.5;
+}
+
+.site-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.site-link {
+  color: #cccccc;
+  text-decoration: none;
+}
+
+.site-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.site-link.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.site-link:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
 }
 
 .more-info:focus-visible {
